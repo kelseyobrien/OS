@@ -500,8 +500,9 @@ function shellLoad(args){
 
 function shellRun(args){
 	if (args.length > 0)
-    {
+	{
         var pid = args[0];
+	alert(_MainMemory);
 	}
 	else{
 		_StdIn.putText("Please enter a pid.");

@@ -28,6 +28,7 @@
    <script type="text/javascript" src="scripts/os/kernel.js"></script>
    <script type="text/javascript" src="scripts/os/programLoad.js"></script>
    <script type="text/javascript" src="scripts/os/pcb.js"></script>
+   <script type="text/javascript" src="scripts/os/memoryManager.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="scripts/utils.js"></script>
@@ -37,6 +38,29 @@
 <body onload="hostInit();">
 
 <div id="divMain" style="width:100%;">
+
+            <div id = "divCPUInfo" style="margin-left:950px;">
+	<label>
+	CPU
+	<br>
+	<table class = "CPUInfo">
+		<tr>
+			<td>PC</td>
+			<td>ACC</td>
+			<td>X Reg</td>
+			<td>Y Reg</td>
+			<td>Z Flag</td>
+		</tr>
+		<tr>
+			<td id = pc></td>
+			<td id = acc></td>
+			<td id = xreg></td>
+			<td id = yreg></td>
+			<td id = zflag></td>
+		</tr>
+	</table>
+	</label>
+	</div>
 
    <div id="divButtonBar" style="margin:4px;">
       <input type="button"
@@ -72,8 +96,9 @@
               height="500px"
               tabindex="3">
       </canvas>
+
    </div>
-   
+      
    <div id="divtaskbar" style="margin-left:520px;">
 		<label>
 			Task Bar
@@ -115,7 +140,10 @@
       </label>
    </div>
 
+   
 </div>
+
+
 
 <p class="footerText" style="clear:both;">
    <br>

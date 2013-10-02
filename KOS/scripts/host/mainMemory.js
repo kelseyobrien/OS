@@ -7,7 +7,7 @@
  {
 	var memArr = new Array();
 	
-	for (i = 0; i < 256; i++){
+	for (i = 0; i < _TotalMemory; i++){
 	{
 		memArr[i] = "00";
 	}
