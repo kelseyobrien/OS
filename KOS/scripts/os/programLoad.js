@@ -17,9 +17,6 @@
 	_StdIn.putText("Process loaded into memory with PID " + process.pid);
 	//Change process state to loaded
 	process.state = P_LOAD;
-	/*var byte1 = _MemoryManager.getNextByte();
-	var byte2 = _MemoryManager.getNextByte();
-	alert(_MemoryManager.convertAddress(byte2));*/
  }
  
  function createProcess()

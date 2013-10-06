@@ -513,4 +513,19 @@ function shellKrnTrap(args){
 	krnTrapError("TEST: Kernal trapped OS error.");
 }
 
+function displayCPUData()
+{
+	var currentPC 		= document.getElementById("pc");
+	var currentACC 		= document.getElementById("acc");
+	var currentXReg 	= document.getElementById("xreg");
+	var currentYReg 	= document.getElementById("yreg");
+	var currentZFlag 	= document.getElementById("zflag");
+	
+	currentPC.innerHTML 	= _CPU.PC;
+	currentACC.innerHTML 	= _CPU.Acc;
+	currentXReg.innerHTML 	= _CPU.Xreg;
+	currentYReg.innerHTML 	= _CPU.Yreg;
+	currentZFlag.innerHTML 	= _CPU.Zflag;
+}
+
 

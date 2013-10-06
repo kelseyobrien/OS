@@ -33,6 +33,9 @@ function Cpu() {
     this.cycle = function() {
 		this.execute(this.fetch());
         krnTrace("CPU cycle");
+		
+		//Update display every cycle
+		displayCPUData();
         // TODO: Accumulate CPU usage and profiling statistics here.
         // Do the real work here. Be sure to set this.isExecuting appropriately.
     };
@@ -217,7 +220,7 @@ function breakSysCall()
 }
 
 //EC = compare byte in memory to X reg
-//	Z flag set to ) if equal
+//	Z flag set to 0 if equal
 function compToX()
 {
 	var byte1 = parseInt(_MemoryManager.getNextByte());
@@ -225,14 +228,13 @@ function compToX()
 	//Concatinate bytes
 	var hexAddr = byte1 + byte2;
 	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
-	
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		if(_CPU.Xreg === parseInt(_MainMemory[decAddr])){
-			_CPU.Zflag = 0;
+			_CPU.Zflag = 1;
 		}
 		else{
-			_CPU.Zflag = 1;
+			_CPU.Zflag = 0;
 		}
 	}
 	else{	//Address is not valid: shut down OS and log event
@@ -267,14 +269,17 @@ function incByte()
 	var byte2 = parseInt(_MemoryManager.getNextByte());
 	//Concatinate bytes
 	var hexAddr = byte1 + byte2;
+
 	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
-	
+
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		//Get decimal value and increment
 		var decValue = parseInt(_MainMemory[decAddr], 16);
+
 		decValue++;
+
 		//Convert back to hec
 		var hexValue = decValue.toString(16).toUpperCase();
 		_MainMemory[decAddr] = hexValue;
@@ -289,8 +294,6 @@ function incByte()
 //FF = System call
 function sysCall()
 {
-	//alert("got here");
-	//alert(_CPU.Xreg);
 	if (_CPU.Xreg === 1){
 		YString = _CPU.Yreg.toString();
 		
@@ -302,15 +305,12 @@ function sysCall()
 		_StdIn.putText(">");
 	}
 	else if (_CPU.Xreg === 2){
-		//alert(_CPU.Yreg);
-		var strAddr = _MemoryManager.convertAddress(_CPU.Yreg);
-		//alert(strAddr);
+		var strAddr = _CPU.Yreg;
 		var currentByte = _MainMemory[strAddr];
 		var keyCode = 0;
 		var chr = "";
 		
 		while (currentByte != "00"){
-			//alert("in");
 			keyCode = parseInt(currentByte, 16);
 			chr = String.fromCharCode(keyCode);
 			_StdIn.putText(chr);
