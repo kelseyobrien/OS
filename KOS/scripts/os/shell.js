@@ -502,7 +502,7 @@ function shellRun(args){
 	if (args.length > 0)
 	{
         var pid = args[0];
-	alert(_MainMemory);
+		_CPU.isExecuting = true;
 	}
 	else{
 		_StdIn.putText("Please enter a pid.");

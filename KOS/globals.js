@@ -39,6 +39,7 @@ var _FontHeightMargin = 4;        // Additional space added to font size when ad
 var _MainMemory;
 var _TotalMemory = 256;		// Total memory space (will be 768 in the future)
 var _PID = 0; 			// To keep track of which PIDs are already in use
+var _CurrentProcess = null;
 
 //Process states
 var P_NEW 	= 0; // Process new
