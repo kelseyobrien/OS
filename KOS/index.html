@@ -38,108 +38,119 @@
 <body onload="hostInit();">
 
 <div id="divMain" style="width:100%;">
+</div>
+	<table id = "tableDisp">
+	<tbody>
+		<tr>
+			<td><div id="divButtonBar" style="margin:4px;">
+				<input type ="button"
+					id = "btnStartOS"
+					name="brnStartOS"
+					class="normal_button"
+					value="Start"
+					tabindex="0"
+					onclick="hostBtnStartOS_click(this);">
 
+				<input type="button"
+					id = "btnHaltOS"
+					name="brnHaltOS"
+					class="normal_button"
+					disabled="disabled"
+					value="Halt"
+					tabindex="1"
+					onclick="hostBtnHaltOS_click(this);">
 
-   <div id="divButtonBar" style="margin:4px;">
-      <input type="button"
-             id = "btnStartOS"
-             name="brnStartOS"
-             class="normal_button"
-             value="Start"
-             tabindex="0"
-             onclick="hostBtnStartOS_click(this);">
-
-      <input type="button"
-             id = "btnHaltOS"
-             name="brnHaltOS"
-             class="normal_button"
-             disabled="disabled"
-             value="Halt"
-             tabindex="1"
-             onclick="hostBtnHaltOS_click(this);">
-
-      <input type="button"
-             id = "btnReset"
-             name="brnReset"
-             class="normal_button"
-             disabled="disabled"
-             value="Reset"
-             tabindex="2"
-             onclick="hostBtnReset_click(this);">
-   </div>
-
-   <div class = "explore" id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
-      <canvas class = "explore" id="display"
-              width="500px"
-              height="500px"
-              tabindex="3">
-      </canvas>
-
-   </div>
-      
-   <div id="divtaskbar" style="margin-left:520px;">
-		<label>
-			Task Bar
-			<br>
-			<table class = "taskbar"> 
-				<tr >
-					<td>Current Date and Time</td>
-					<td id = current width = "230"></td>
-				</tr>
-				<tr>
-					<td>Status</td>
-					<td id = status width = "230"></td>
-				</tr>		
-			</table>
-		</label>
-	</div>
-
-   <div id="divLog" style="margin-left:520px;">
-      <label>
-         Log
-         <br>
-         <textarea name="taLog"
+			  <input type="button"
+					 id = "btnReset"
+					 name="brnReset"
+					 class="normal_button"
+					 disabled="disabled"
+					 value="Reset"
+					 tabindex="2"
+					 onclick="hostBtnReset_click(this);">
+			</div></td>
+			<td style = "color:white; font-weight:bold;">Control Log</td>
+			<td style = "color:white; font-weight:bold;">Task Bar</td>
+		</tr>
+		<tr valign = "top">
+			<td><div class = "explore" id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+					<canvas class = "explore" id="display"
+						width="500px"
+						height="500px"
+						tabindex="3">
+					</canvas>
+				</div>
+				
+			</td>
+			<td> <div id="divLog">
+				<textarea name="taLog"
                    id  ="taLog"
                    rows="26"
                    cols="48"
-         ></textarea>
-      </label>
-   </div>
-   
-        <div id = "divCPUInfo" style="margin-left:520px;">
-	<label>
-	CPU
-	<br>
-	<table class = "CPUInfo">
-		<tr>
-			<td>PC</td>
-			<td>ACC</td>
-			<td>X Reg</td>
-			<td>Y Reg</td>
-			<td>Z Flag</td>
+				></textarea>
+				</label>
+				</div>
+				
+				<div id="divUserProgramInput" style="margin-left:4px;">
+					<label>User Program Input
+					<br>
+					<textarea name="taProgramInput"
+					   id  ="taProgramInput"
+					   rows="8"
+					   cols="48"
+					></textarea>
+					</label>
+				</div>
+			</td>
+			<td><div id="divtaskbar">
+				<table class = "taskbar"> 
+					<tr>
+						<td style="color:red; font-weight:bold;">Current Date and Time</td>
+						<td id = current width = "230" style="color:black;"></td>
+					</tr>
+					<tr>
+						<td style="color:red; font-weight:bold;">Status</td>
+						<td id = status width = "230" style="color:black;"></td>
+					</tr>		
+				</table>
+			</label>
+			</div>
+			<br><br>
+			<div id = "divCPUInfo">
+				<label>
+				CPU
+				<br>
+				<table class = "CPUInfo">
+					<tr style="color:red;">
+						<td>PC</td>
+						<td>ACC</td>
+						<td>X Reg</td>
+						<td>Y Reg</td>
+						<td>Z Flag</td>
+					</tr>
+					<tr style = "color: black;">
+						<td id = pc></td>
+						<td id = acc></td>
+						<td id = xreg></td>
+						<td id = yreg></td>
+						<td id = zflag></td>
+					</tr>
+				</table>
+				</label>
+				</div>
+				<br><br>
+				<div id = "divMemDisplay">
+					<label>Memory Display
+					<table class = "MemDisplay" id = "MemDisplay">
+					</table>
+					</label>
+					</div>
+			</td>
 		</tr>
+		
 		<tr>
-			<td id = pc></td>
-			<td id = acc></td>
-			<td id = xreg></td>
-			<td id = yreg></td>
-			<td id = zflag></td>
-		</tr>
+	</tbody>
 	</table>
-	</label>
-	</div>
-
-   <div id="divUserProgramInput" style="margin-left:4px;">
-      <label>
-         User Program Input
-         <br>
-         <textarea name="taProgramInput"
-                   id  ="taProgramInput"
-                   rows="8"
-                   cols="48"
-         ></textarea>
-      </label>
-   </div>
 
    
 </div>

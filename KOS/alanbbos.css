@@ -1,7 +1,7 @@
 /* alanbbos.css */
 
 body {
-   background: #909193 url(images/linen.png) repeat;
+   background: black;
    font-family: Helvetica, Verdana, Arial, sans-serif;
 	font-size: 12pt;
 	font-weight: normal;
@@ -30,6 +30,11 @@ h3 {
 	font-style: normal;	
 }
 
+label {
+	color: white;
+	font-weight:bold;
+}
+
 #display {
 	background-color:#DFDBC3;
 	border: 2px solid red; 
@@ -54,31 +59,55 @@ div.explore{
 table.taskbar {
 
 	border-width: 1px;
-	border-color: #999999;
+	border-color: red;
 	border-collapse: collapse;
 }
 
 table.taskbar td {
-	background:#dcddc0 url('cell-grey.jpg');
+	background:white;
 	border-width: 1px;
 	padding: 8px;
 	border-style: solid;
-	border-color: #999999;
+	border-color: black;
 }
 
 table.CPUInfo {
-
 	border-width: 1px;
-	border-color: #999999;
+	border-color: red;
 	border-collapse: collapse;
 }
 
 table.CPUInfo td {
-	background:#dcddc0 url('cell-grey.jpg');
+	background:white;
 	border-width: 1px;
 	padding: 8px;
 	border-style: solid;
-	border-color: #999999;
+	border-color: black;
 }
 
+#divMemDisplay
+{
+	height: 340px;
+    width: 375px;
+    margin-bottom:5px;
+	overflow: auto;
+}
+
+table.MemDisplay {
+	border-width: 1px;
+	border-color: red;
+	border-collapse: collapse;
+	height: 340px;
+    width: 355px;
+    margin-bottom:5px;
+	overflow: auto;
+}
+
+table.MemDisplay td {
+	background:white;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: black;
+}
 

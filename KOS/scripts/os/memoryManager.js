@@ -40,3 +40,36 @@ function MemoryManager()
 	
 	
 }
+
+function createTable(){
+	var table = document.getElementById("MemDisplay");
+	var i = 0;
+	for(var r = 0; r < 32; r++){
+		var row = table.insertRow(-1);
+        var firstCell = row.insertCell(-1);
+        firstCell.appendChild(document.createTextNode("0x" + i.toString(16).toUpperCase()));
+		firstCell.style.color = "red";
+		firstCell.style.fontWeight = "900";
+		
+		 for (var c = 0; c < 8; c++) {
+            var cell = row.insertCell(-1);
+            cell.appendChild(document.createTextNode("00"));
+			cell.style.color = "black";
+            i++;
+        }
+	}
+}
+
+function updateTable() {
+    // Get the table id
+    var table = document.getElementById("MemDisplay");
+    var memoryAddress = 0;
+
+    // Update the rows with the new memory value
+    for (var r = 0; r < 32; r++) {
+        for (var c = 1; c < 9; c++) {
+            table.rows[r].cells[c].innerHTML = _MainMemory[memoryAddress];
+            memoryAddress++;
+        }
+    }
+}

@@ -6,18 +6,20 @@
  */
  
  function loadProgram(userCode){
-	
-	var process = createProcess();
+	_PCBUpToDate = createProcess();
 	//Load user program into _MainMemory
 	var opCode = userCode.split(/\s/);
 	for (var i = 0; i < opCode.length; i++){
 		var code = opCode[i];
 		_MainMemory[i] = code;
 	}
-	_StdIn.putText("Process loaded into memory with PID " + process.pid);
+	_StdIn.putText("Process loaded into memory with PID " + _PCBUpToDate.pid);
+	_ProgramsList[_PCBUpToDate.pid] = _PCBUpToDate.pid;
 	//Change process state to loaded
-	process.state = P_LOAD;
+	_PCBUpToDate.state = P_LOAD;
+	updateTable();
  }
+ 
  
  function createProcess()
  {

@@ -40,6 +40,8 @@ var _MainMemory;
 var _TotalMemory = 256;		// Total memory space (will be 768 in the future)
 var _PID = 0; 			// To keep track of which PIDs are already in use
 var _CurrentProcess = null;
+var _ProgramsList = null;
+var _PCBUpToDate = null;
 
 //Process states
 var P_NEW 	= 0; // Process new

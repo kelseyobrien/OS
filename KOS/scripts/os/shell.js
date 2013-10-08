@@ -487,22 +487,21 @@ function shellLoad(args){
 		}
 		i++;
 	}
-	
-	/*if(validate == true){
-		_StdIn.putText("The input is valid");
-	}
-	else if(validate == false){
-		_StdIn.putText("Sorry the input is not valid");
-	}*/
 	userInput = "";
 	allInput.splice(0, allInput.length);
+	//displayMemory();
 }
 
 function shellRun(args){
-	if (args.length > 0)
+	if (args.length > 0) 
 	{
         var pid = args[0];
-		_CPU.isExecuting = true;
+		if(typeof _ProgramsList[pid] == "undefined" || isNaN(pid)){
+		_StdIn.putText("Invalid pid.");
+		}
+		else{
+			_CPU.isExecuting = true;
+			}
 	}
 	else{
 		_StdIn.putText("Please enter a pid.");
@@ -521,11 +520,13 @@ function displayCPUData()
 	var currentYReg 	= document.getElementById("yreg");
 	var currentZFlag 	= document.getElementById("zflag");
 	
-	currentPC.innerHTML 	= _CPU.PC;
-	currentACC.innerHTML 	= _CPU.Acc;
-	currentXReg.innerHTML 	= _CPU.Xreg;
-	currentYReg.innerHTML 	= _CPU.Yreg;
-	currentZFlag.innerHTML 	= _CPU.Zflag;
+	currentPC.innerHTML 	= "0x" + _CPU.PC.toString(16).toUpperCase();
+	currentACC.innerHTML 	= _CPU.Acc.toString(16).toUpperCase();
+	currentXReg.innerHTML 	= _CPU.Xreg.toString(16).toUpperCase();
+	currentYReg.innerHTML 	= _CPU.Yreg.toString(16).toUpperCase();
+	currentZFlag.innerHTML 	= _CPU.Zflag.toString(16).toUpperCase();
 }
+
+
 
 

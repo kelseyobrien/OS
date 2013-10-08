@@ -36,6 +36,8 @@ function Cpu() {
 		
 		//Update display every cycle
 		displayCPUData();
+		updateTable();
+		//displayMemory();
         // TODO: Accumulate CPU usage and profiling statistics here.
         // Do the real work here. Be sure to set this.isExecuting appropriately.
     };
@@ -93,11 +95,10 @@ function loadAccConst()
 //AD = Load accumulator from memory
 function loadAccMem()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
 	//Concatinate bytes
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -115,13 +116,18 @@ function loadAccMem()
 //8D = Store accumulator in memory
 function storeAccMem()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		var hexAcc = _CPU.Acc.toString(16).toUpperCase();
+		
+		//Format Address
+		if (hexAcc.length === 1){
+			hexAcc = "0" + hexAcc;
+		}
+		
 		_MainMemory[decAddr] = hexAcc;
 	}
 	else{	//Address is not valid: shut down OS and log event
@@ -135,10 +141,9 @@ function storeAccMem()
 //6D = Add with carry
 function addWCarry()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		_CPU.Acc += parseInt(_MainMemory[decAddr], 16);
@@ -160,11 +165,9 @@ function loadXWConst()
 //AE = Load X register from memory
 function loadXMem()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	//Concatinate bytes
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -189,11 +192,9 @@ function loadYWConst()
 //AC = Load Y register from memory
 function loadYMem()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	//Concatinate bytes
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -216,6 +217,29 @@ function noOp()
 //00 = break or system call
 function breakSysCall()
 {
+	_PCBUpToDate.pc 	= _CPU.PC.toString(16).toUpperCase();
+	_PCBUpToDate.acc	= _CPU.Acc.toString(16).toUpperCase();
+	_PCBUpToDate.x		= _CPU.Xreg.toString(16).toUpperCase();
+	_PCBUpToDate.y		= _CPU.Yreg.toString(16).toUpperCase();
+	_PCBUpToDate.z		= _CPU.Zflag.toString(16).toUpperCase();
+	_PCBUpToDate.state 	= P_TERM;
+	
+	var str1 = "PCB [pid: " + _PCBUpToDate.pid + 
+					", base: " + _PCBUpToDate.base + 
+					", limit : " + _PCBUpToDate.limit +
+					", pc : " + _PCBUpToDate.pc +
+					", acc : " + _PCBUpToDate.acc + ",";
+	
+	var str2 = "x reg : " + _PCBUpToDate.x +
+				", y reg : " + _PCBUpToDate.y +
+				", z flag : " + _PCBUpToDate.z + "]";
+	_StdIn.putText(str1);
+	_StdIn.advanceLine();
+	
+	_StdIn.putText(str2);
+	_StdIn.advanceLine();
+	_StdIn.putText(">");
+	
 	_CPU.isExecuting = false;
 }
 
@@ -223,11 +247,9 @@ function breakSysCall()
 //	Z flag set to 0 if equal
 function compToX()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	//Concatinate bytes
-	var hexAddr = byte1 + byte2;
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		if(_CPU.Xreg === parseInt(_MainMemory[decAddr])){
@@ -265,12 +287,9 @@ function branchXBytes()
 //EE = Increment value of a byte
 function incByte()
 {
-	var byte1 = parseInt(_MemoryManager.getNextByte());
-	var byte2 = parseInt(_MemoryManager.getNextByte());
-	//Concatinate bytes
-	var hexAddr = byte1 + byte2;
-
-	var decAddr = parseInt(hexAddr, 16) + _MemoryManager.getRelocationValue();
+	var byte1 = _MemoryManager.getNextByte();
+	var byte2 = _MemoryManager.getNextByte();
+	var decAddr = parseInt((byte2 + byte1), 16);
 
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -282,6 +301,12 @@ function incByte()
 
 		//Convert back to hec
 		var hexValue = decValue.toString(16).toUpperCase();
+		
+		//Format Address
+		if (hexValue.length === 1){
+			hexValue = "0" + hexValue;
+		}
+		
 		_MainMemory[decAddr] = hexValue;
 	}
 	else{	//Address is not valid: shut down OS and log event
