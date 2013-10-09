@@ -474,22 +474,35 @@ function shellLoad(args){
 	//var validate = true;
 	var userInput = document.getElementById("taProgramInput").value.trim();
 	var allInput = userInput.split(" ");
-	var testHex = /[a-f|A-F|0-9]{1,2}\s?/mg;
-	var i = 0;
-	while (i < allInput.length){
-		//If progam is valid hex code prompt user and load program into memory
-		if(testHex.test(allInput[i]) == true){
-			loadProgram(userInput);
+
+	if (validateProgram(allInput) == true){
+		loadProgram(userInput);
+	}
+	else{
+		_StdIn.putText("Sorry the input is not valid");
+	}
+	
+	//Clear data before next load
+	userInput = "";
+	allInput.splice(0, allInput.length);
+}
+
+function validateProgram(programCode){
+		var testHex = /[a-f|A-F|0-9]{1,2}\s?/mg;
+		var i = 0;
+		var result;
+		while (i < programCode.length){
+		//If progam is valid hex code all OS to load memory
+		if(testHex.test(programCode[i]) == true){
+			result = true;
 		}
-		else if (testHex.test(allInput[i]) == false){
-			_StdIn.putText("Sorry the input is not valid");
-			i = allInput.length;	
+		else if (testHex.test(programCode[i]) == false){
+			result = false;
+			i = programCode.length;	
 		}
 		i++;
 	}
-	userInput = "";
-	allInput.splice(0, allInput.length);
-	//displayMemory();
+	return result;
 }
 
 function shellRun(args){
