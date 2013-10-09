@@ -108,7 +108,6 @@ function hostBtnStartOS_click(btn)
     
     //Create memory
     _MainMemory = new MainMemory();
-	alert("made memory");
 	
 	//Creak MemoryManager
 	_MemoryManager = new MemoryManager();

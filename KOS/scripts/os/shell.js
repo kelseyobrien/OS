@@ -473,7 +473,6 @@ function shellStatus(args){
 function shellLoad(args){
 	//var validate = true;
 	var userInput = document.getElementById("taProgramInput").value.trim();
-	alert(userInput);
 	var allInput = userInput.split(" ");
 
 	if (validateProgram(allInput) == true){
