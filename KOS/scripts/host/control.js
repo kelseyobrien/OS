@@ -75,9 +75,12 @@ function hostLog(msg, source)
 	taskTime.innerHTML = current.getMonth() + 1 + "/"+ current.getDate()
 					+ "/" + current.getFullYear() + " " + current.getHours() + ":" 
 					+ current.getMinutes() + ":" + current.getSeconds();
-					
+		
 	taskStatus.innerHTML = status;
     // Optionally update a log database or some streaming service.
+
+		
+	
 }
 
 
@@ -104,6 +107,20 @@ function hostBtnStartOS_click(btn)
     _hardwareClockID = setInterval(hostClockPulse, CPU_CLOCK_INTERVAL);
     // .. and call the OS Kernel Bootstrap routine.
     krnBootstrap();
+    
+    //Create memory
+    _MainMemory = new MainMemory();
+	
+	//Creak MemoryManager
+	_MemoryManager = new MemoryManager();
+	
+	//List of user programs loaded
+	_ProgramsList = new Array();
+	
+	//Up to date PCB
+	_PCBUpToDate = new PCB;
+	
+	createTable();
 }
 
 function hostBtnHaltOS_click(btn)

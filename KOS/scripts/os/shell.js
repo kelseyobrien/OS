@@ -123,6 +123,13 @@ function shellInit() {
     sc.function = shellKrnTrap;
     this.commandList[this.commandList.length] = sc;
 	
+	//run
+	sc = new ShellCommand();
+    sc.command = "run";
+    sc.description = "<pid> - Run program specified by <pid>.";
+    sc.function = shellRun;
+    this.commandList[this.commandList.length] = sc;
+	
 
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
@@ -464,34 +471,62 @@ function shellStatus(args){
 }
 
 function shellLoad(args){
-	var validate = true;
+	//var validate = true;
 	var userInput = document.getElementById("taProgramInput").value.trim();
 	var allInput = userInput.split(" ");
 	var testHex = /[a-f|A-F|0-9]{1,2}\s?/mg;
 	var i = 0;
 	while (i < allInput.length){
+		//If progam is valid hex code prompt user and load program into memory
 		if(testHex.test(allInput[i]) == true){
-			validate = true;
+			loadProgram(userInput);
 		}
 		else if (testHex.test(allInput[i]) == false){
-			validate = false;
+			_StdIn.putText("Sorry the input is not valid");
 			i = allInput.length;	
 		}
 		i++;
 	}
-	
-	if(validate == true){
-		_StdIn.putText("The input is valid");
-	}
-	else if(validate == false){
-		_StdIn.putText("Sorry the input is not valid");
-	}
 	userInput = "";
 	allInput.splice(0, allInput.length);
+	//displayMemory();
+}
+
+function shellRun(args){
+	if (args.length > 0) 
+	{
+        var pid = args[0];
+		if(typeof _ProgramsList[pid] == "undefined" || isNaN(pid)){
+		_StdIn.putText("Invalid pid.");
+		}
+		else{
+			_CPU.isExecuting = true;
+			}
+	}
+	else{
+		_StdIn.putText("Please enter a pid.");
+	}
 }
 
 function shellKrnTrap(args){
 	krnTrapError("TEST: Kernal trapped OS error.");
 }
+
+function displayCPUData()
+{
+	var currentPC 		= document.getElementById("pc");
+	var currentACC 		= document.getElementById("acc");
+	var currentXReg 	= document.getElementById("xreg");
+	var currentYReg 	= document.getElementById("yreg");
+	var currentZFlag 	= document.getElementById("zflag");
+	
+	currentPC.innerHTML 	= "0x" + _CPU.PC.toString(16).toUpperCase();
+	currentACC.innerHTML 	= _CPU.Acc.toString(16).toUpperCase();
+	currentXReg.innerHTML 	= _CPU.Xreg.toString(16).toUpperCase();
+	currentYReg.innerHTML 	= _CPU.Yreg.toString(16).toUpperCase();
+	currentZFlag.innerHTML 	= _CPU.Zflag.toString(16).toUpperCase();
+}
+
+
 
 

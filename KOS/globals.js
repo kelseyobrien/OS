@@ -36,6 +36,21 @@ var _DefaultFontFamily = "sans";  // Ignored, I think. The was just a place-hold
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;        // Additional space added to font size when advancing a line.
 
+var _MainMemory;
+var _TotalMemory = 256;		// Total memory space (will be 768 in the future)
+var _PID = 0; 			// To keep track of which PIDs are already in use
+var _CurrentProcess = null;
+var _ProgramsList = null;
+var _PCBUpToDate = null;
+
+//Process states
+var P_NEW 	= 0; // Process new
+var P_LOAD   	= 1; // Process loaded in memory
+var P_RUN 	= 2; // Process currently executing
+//var P_READY	= 3; // Process ready but waiting (will need this eventually)
+var P_TERM 	= 4; // Process finished executing
+
+
 // Default the OS trace to be on.
 var _Trace = true;
 
