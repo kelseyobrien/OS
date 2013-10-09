@@ -11,6 +11,7 @@
 	var opCode = userCode.split(/\s/);
 	for (var i = 0; i < opCode.length; i++){
 		var code = opCode[i];
+		alert(_MainMemory);
 		_MainMemory[i] = code;
 	}
 	_StdIn.putText("Process loaded into memory with PID " + _PCBUpToDate.pid);
