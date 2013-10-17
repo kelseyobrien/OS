@@ -513,12 +513,16 @@ function shellRun(args){
 		_StdIn.putText("Invalid pid.");
 		}
 		else{
+			//Clear CPU before executing
+			clearCPU();
+			//Begin executing
 			_CPU.isExecuting = true;
 			}
 	}
 	else{
 		_StdIn.putText("Please enter a pid.");
 	}
+	
 }
 
 function shellKrnTrap(args){
@@ -538,6 +542,14 @@ function displayCPUData()
 	currentXReg.innerHTML 	= _CPU.Xreg.toString(16).toUpperCase();
 	currentYReg.innerHTML 	= _CPU.Yreg.toString(16).toUpperCase();
 	currentZFlag.innerHTML 	= _CPU.Zflag.toString(16).toUpperCase();
+}
+
+function clearCPU(){
+	_CPU.PC 	= 0;
+	_CPU.Acc 	= 0;
+	_CPU.Xreg 	= 0;
+	_CPU.Yreg	= 0;
+	_CPU.Zflag	= 0;
 }
 
 

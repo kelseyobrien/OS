@@ -192,7 +192,7 @@ function krnTrapError(msg)
 	var img = document.getElementById("screen");
 	var pattern = ctx.createPattern(img, "repeat");
 	ctx.fillStyle = pattern;
-	ctx.fillRect(0,0,500,500);
+	ctx.fillRect(0,0,1000000,1000000);
 	
     krnShutdown();
 }
