@@ -19,10 +19,10 @@ function MemoryManager()
 			spaceNum : 2
 			},
 		spaceThree: {
-		open : true, 
-		base : 512, 
-		limit : 767, 
-		spaceNum : 3
+			open : true, 
+			base : 512, 
+			limit : 767, 
+			spaceNum : 3
 		}
 	};
 	
@@ -59,12 +59,20 @@ function MemoryManager()
 function createTable(){
 	var table = document.getElementById("MemDisplay");
 	var i = 0;
-	for(var r = 0; r < 32; r++){
+	for(var r = 0; r < 96; r++){
 		var row = table.insertRow(-1);
         var firstCell = row.insertCell(-1);
         firstCell.appendChild(document.createTextNode("0x" + i.toString(16).toUpperCase()));
-		firstCell.style.color = "red";
-		firstCell.style.fontWeight = "900";
+		
+		if (r === 0 || r === 32 || r === 64){
+			firstCell.style.color = "yellow";
+			firstCell.style.backgroundColor = "red";
+			firstCell.style.fontWeight = "900";
+		}
+		else{
+			firstCell.style.color = "red";
+			firstCell.style.fontWeight = "900";
+		}
 		
 		 for (var c = 0; c < 8; c++) {
             var cell = row.insertCell(-1);
@@ -81,7 +89,7 @@ function updateTable() {
     var memoryAddress = 0;
 
     // Update the rows with the new memory value
-    for (var r = 0; r < 32; r++) {
+    for (var r = 0; r < 96; r++) {
         for (var c = 1; c < 9; c++) {
             table.rows[r].cells[c].innerHTML = _MainMemory[memoryAddress];
             memoryAddress++;

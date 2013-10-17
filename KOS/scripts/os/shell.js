@@ -129,8 +129,31 @@ function shellInit() {
     sc.description = "<pid> - Run program specified by <pid>.";
     sc.function = shellRun;
     this.commandList[this.commandList.length] = sc;
-	
 
+	sc = new ShellCommand();
+    sc.command = "runall";
+    sc.description = "- Run all programs at once.";
+    sc.function = shellRunAll;
+    this.commandList[this.commandList.length] = sc;
+
+	sc = new ShellCommand();
+    sc.command = "quantum";
+    sc.description = "<int> - Set the Round Robin quantum.";
+    sc.function = shellQuantum;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "activepids";
+    sc.description = "- Displays the PIDs of all active processes.";
+    sc.function = shellActivePIDs;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "kill";
+    sc.description = "<pid> - Kill active process with specified PID.";
+    sc.function = shellKill;
+    this.commandList[this.commandList.length] = sc;
+	
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
 
@@ -476,7 +499,8 @@ function shellLoad(args){
 	var allInput = userInput.split(" ");
 
 	if (validateProgram(allInput) == true){
-		loadProgram(userInput);
+		var pid = loadProgram(userInput);
+		_StdIn.putText("Process loaded into memory with PID " + pid);
 	}
 	else{
 		_StdIn.putText("Sorry the input is not valid");
@@ -552,6 +576,34 @@ function clearCPU(){
 	_CPU.Zflag	= 0;
 }
 
+function shellRunAll(args){
+	_StdIn.putText("Run all programs at once....eventually");
+}
 
+function shellQuantum(args){
+	if (args.length > 0) 
+	{
+        var quantum = args[0];
+		_StdIn.putText("Quantum = " + quantum);
+	}
+	else{
+		_StdIn.putText("Please enter a quantum.");
+	}
+}
+
+function shellActivePIDs(args){
+	_StdIn.putText("displays all active PIDs....eventually");
+}
+
+function shellKill(args){
+	if (args.length > 0)
+	{
+		var pid = args[0];
+		_StdIn.putText("Kill process with PID = " + pid);
+	}
+	else{
+		_StdIn.putText("Please enter a PID");
+	}
+}
 
 

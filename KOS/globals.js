@@ -37,7 +37,7 @@ var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;        // Additional space added to font size when advancing a line.
 
 var _MainMemory;
-var _TotalMemory = 256;		// Total memory space (will be 768 in the future)
+var _TotalMemory = 768;		// Total memory space (will be 768 in the future)
 var _PID = 0; 			// To keep track of which PIDs are already in use
 var _CurrentProcess = null;
 var _ProgramsList = null;
