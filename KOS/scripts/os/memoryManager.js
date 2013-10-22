@@ -29,7 +29,7 @@ function MemoryManager()
 	this.getRelocationValue = function()
 	{
 		//Reture 0 for now because there is only one process
-		return 0;
+		return _CurrentProcess.base;
 	}
 	
 	this.getNextByte = function()
@@ -45,12 +45,10 @@ function MemoryManager()
 	
 	this.isValidAddress = function(address)
 	{
-		if (address >= 0 && address <= 255){
-			return true;
-		}
-		else{
-			return false;
-		}
+		var base = _CurrentProcess.base;
+		var limit = _CurrentProcess.limit;
+
+		return ( address >= base && address <= limit );
 	}
 	
 	

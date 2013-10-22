@@ -43,12 +43,14 @@ function Cpu() {
     };
 	
 	this.fetch = function(){
-		var relocation = _MemoryManager.getRelocationValue() + this.PC;
-		return _MainMemory[relocation];
+		var relocation = _MemoryManager.getRelocationValue();
+		alert(relocation + this.PC);
+		return _MainMemory[this.PC + relocation];
 	}
 	
 	this.execute = function(code)
 	{
+		alert(code);
 		switch(code)
 		{
 			case "A9" : loadAccConst();
@@ -98,7 +100,7 @@ function loadAccMem()
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
 	//Concatinate bytes
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -107,6 +109,7 @@ function loadAccMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 
@@ -118,7 +121,7 @@ function storeAccMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		var hexAcc = _CPU.Acc.toString(16).toUpperCase();
@@ -132,6 +135,7 @@ function storeAccMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -143,13 +147,14 @@ function addWCarry()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		_CPU.Acc += parseInt(_MainMemory[decAddr], 16);
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -167,7 +172,7 @@ function loadXMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -176,6 +181,7 @@ function loadXMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -194,7 +200,7 @@ function loadYMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -203,6 +209,7 @@ function loadYMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -249,7 +256,7 @@ function compToX()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		if(_CPU.Xreg === parseInt(_MainMemory[decAddr])){
@@ -261,6 +268,7 @@ function compToX()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -289,7 +297,7 @@ function incByte()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -311,6 +319,7 @@ function incByte()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
+		alert("here");
 		krnTrace("The requested address is not valid");
 	}
 	_CPU.PC++;
@@ -330,7 +339,7 @@ function sysCall()
 		_StdIn.putText(">");
 	}
 	else if (_CPU.Xreg === 2){
-		var strAddr = _CPU.Yreg;
+		var strAddr = _CPU.Yreg + _MemoryManager.getRelocationValue();
 		var currentByte = _MainMemory[strAddr];
 		var keyCode = 0;
 		var chr = "";

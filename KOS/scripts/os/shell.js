@@ -500,7 +500,12 @@ function shellLoad(args){
 
 	if (validateProgram(allInput) == true){
 		var pid = loadProgram(userInput);
+		if (typeof pid != "undefined"){
 		_StdIn.putText("Process loaded into memory with PID " + pid);
+		}
+		else {
+			_StdIn.putText("Sorry there is no space open");
+		}
 	}
 	else{
 		_StdIn.putText("Sorry the input is not valid");
@@ -537,6 +542,7 @@ function shellRun(args){
 		_StdIn.putText("Invalid pid.");
 		}
 		else{
+			_CurrentProcess = _ProgramsList[pid];
 			//Clear CPU before executing
 			clearCPU();
 			//Begin executing
