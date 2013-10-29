@@ -29,28 +29,42 @@ function Cpu() {
         this.Zflag = 0;      
         this.isExecuting = false;  
     };
+	
+	this.update = function(pc, acc, x, y, z)
+	{
+		this.PC    = pc;
+        this.Acc   = acc;
+        this.Xreg  = x;
+        this.Yreg  = y;
+        this.Zflag = z;
+	}
     
     this.cycle = function() {
 		this.execute(this.fetch());
         krnTrace("CPU cycle");
+		if (_Cycles > ROUND_QUANTUM){
+			_Scheduler.contextSwitch();
+		}
+		//Increment cycle counter
+		_Cycles++;
 		
 		//Update display every cycle
 		displayCPUData();
 		updateTable();
-		//displayMemory();
+
         // TODO: Accumulate CPU usage and profiling statistics here.
         // Do the real work here. Be sure to set this.isExecuting appropriately.
     };
 	
 	this.fetch = function(){
 		var relocation = _MemoryManager.getRelocationValue();
-		alert(relocation + this.PC);
+		//alert(relocation + this.PC);
 		return _MainMemory[this.PC + relocation];
 	}
 	
 	this.execute = function(code)
 	{
-		alert(code);
+		//alert(code);
 		switch(code)
 		{
 			case "A9" : loadAccConst();
@@ -224,30 +238,16 @@ function noOp()
 //00 = break or system call
 function breakSysCall()
 {
-	_PCBUpToDate.pc 	= _CPU.PC.toString(16).toUpperCase();
-	_PCBUpToDate.acc	= _CPU.Acc.toString(16).toUpperCase();
-	_PCBUpToDate.x		= _CPU.Xreg.toString(16).toUpperCase();
-	_PCBUpToDate.y		= _CPU.Yreg.toString(16).toUpperCase();
-	_PCBUpToDate.z		= _CPU.Zflag.toString(16).toUpperCase();
-	_PCBUpToDate.state 	= P_TERM;
-	
-	var str1 = "PCB [pid: " + _PCBUpToDate.pid + 
-					", base: " + _PCBUpToDate.base + 
-					", limit : " + _PCBUpToDate.limit +
-					", pc : " + _PCBUpToDate.pc +
-					", acc : " + _PCBUpToDate.acc + ",";
-	
-	var str2 = "x reg : " + _PCBUpToDate.x +
-				", y reg : " + _PCBUpToDate.y +
-				", z flag : " + _PCBUpToDate.z + "]";
-	_StdIn.putText(str1);
-	_StdIn.advanceLine();
-	
-	_StdIn.putText(str2);
-	_StdIn.advanceLine();
-	_StdIn.putText(">");
-	
+	_CurrentProcess.update(P_TERM,  _CPU.PC, _CPU.Acc, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+	//If there is process waiting in ready queue -> context switch
+	if(_ReadyQueue.getSize() >= 1)
+	{
+		_Scheduler.contextSwitch();
+	}
+	else { //No process waiting in the ready queue
 	_CPU.isExecuting = false;
+	}
+
 }
 
 //EC = compare byte in memory to X reg

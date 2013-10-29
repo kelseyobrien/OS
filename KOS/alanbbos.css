@@ -111,3 +111,17 @@ table.MemDisplay td {
 	border-color: black;
 }
 
+table.ReadyQueue {
+	border-width: 1px;
+	border-color: red;
+	border-collapse: collapse;
+}
+
+table.ReadyQueue td {
+	background:white;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: black;
+}
+

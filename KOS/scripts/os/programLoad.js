@@ -16,13 +16,8 @@
 		for (var i = _PCBUpToDate.base; i < opCode.length + _PCBUpToDate.base; i++){
 		// LOCATION 00 DOESN'T DISPLAY FOR SPACE 1 PROB SHOULD FIX THIS
 			//If program goes beyond limit only stop loading 
-			if ( i === _PCBUpToDate.limit + 1){
-				i = opCode.length + _PCBUpToDate.base;
-			}
-			else{
 				var code = opCode[i - _PCBUpToDate.base];
 				_MainMemory[i] = code
-			}
 		}
 		
 		_ProgramsList[_PCBUpToDate.pid] = _PCBUpToDate;
@@ -59,7 +54,6 @@
 		return (new PCB(pid, base, limit, PC, state));
 	}
 	else if (_MemoryManager.mapOfMem.spaceTwo.open){
-		alert("2");
 		base = _MemoryManager.mapOfMem.spaceTwo.base;
 		limit = _MemoryManager.mapOfMem.spaceTwo.limit;
 		_MemoryManager.mapOfMem.spaceTwo.open = false;

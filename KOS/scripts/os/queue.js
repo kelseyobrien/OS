@@ -47,4 +47,8 @@ function Queue()
 	this.backSpace = function() {
 		this.q.pop();
 	}
+	
+	this.getItem = function(index) {
+		return this.q[index]
+	}
 }

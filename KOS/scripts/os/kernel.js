@@ -93,6 +93,8 @@ function krnOnCPUClockPulse()
     {
        krnTrace("Idle");
     }
+	
+	updateReadyQueueDisplay();
 }
 
 

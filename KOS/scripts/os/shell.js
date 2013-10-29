@@ -497,19 +497,23 @@ function shellLoad(args){
 	//var validate = true;
 	var userInput = document.getElementById("taProgramInput").value.trim();
 	var allInput = userInput.split(" ");
-
-	if (validateProgram(allInput) == true){
-		var pid = loadProgram(userInput);
-		if (typeof pid != "undefined"){
-		_StdIn.putText("Process loaded into memory with PID " + pid);
+	if (allInput.length <= _PartitionSize){
+		if (validateProgram(allInput) == true){
+			var pid = loadProgram(userInput);
+			if (typeof pid != "undefined"){
+			_StdIn.putText("Process loaded into memory with PID " + pid);
+			}
+			else {
+				_StdIn.putText("Sorry there is no space open");
+			}
 		}
-		else {
-			_StdIn.putText("Sorry there is no space open");
+		else{
+			_StdIn.putText("Sorry the input is not valid");
 		}
 	}
 	else{
-		_StdIn.putText("Sorry the input is not valid");
-	}
+		_StdIn.putText("Program too long for memory");
+		}
 	
 	//Clear data before next load
 	userInput = "";
@@ -543,6 +547,10 @@ function shellRun(args){
 		}
 		else{
 			_CurrentProcess = _ProgramsList[pid];
+			_CurrentProcess.state = P_RUN;
+			
+			_ReadyQueue.enqueue(_CurrentProcess);
+			_ReadyQueue.dequeue();
 			//Clear CPU before executing
 			clearCPU();
 			//Begin executing
@@ -583,33 +591,69 @@ function clearCPU(){
 }
 
 function shellRunAll(args){
-	_StdIn.putText("Run all programs at once....eventually");
+	var currProcess = null;
+	for ( i in _ProgramsList)
+	{
+		currProcess = _ProgramsList[i];
+		_ReadyQueue.enqueue(currProcess);
+	}
+	
+		_CurrentProcess = _ReadyQueue.dequeue();
+		clearCPU();
+		_CPU.isExecuting = true;
 }
+
 
 function shellQuantum(args){
 	if (args.length > 0) 
 	{
-        var quantum = args[0];
-		_StdIn.putText("Quantum = " + quantum);
-	}
-	else{
-		_StdIn.putText("Please enter a quantum.");
+        var newQuantum = args[0];
+		if (isNaN(newQuantum) || newQuantum < 0){
+			_StdIn.putText("Sorry that is not a valid quantum...try again");
+		}
+		else{
+			ROUND_QUANTUM = newQuantum;
+			_StdIn.putText("Quantum = " + newQuantum);
+		}
 	}
 }
 
 function shellActivePIDs(args){
-	_StdIn.putText("displays all active PIDs....eventually");
+	if (_ProgramsList.length != 0){
+		_StdIn.putText("Active PIDS: ");
+		for (i in _ProgramsList){
+			//var currPID = _ProgramsList[i].pid;
+			_StdIn.putText(_ProgramsList[i].pid.toString());
+			_StdIn.putText(" ");
+			
+		}
+	}
+	else{
+		_StdIn.putText("There are currently no active PIDs.");
+	}
+	
 }
 
 function shellKill(args){
-	if (args.length > 0)
+	/*if (args.length > 0)
 	{
-		var pid = args[0];
-		_StdIn.putText("Kill process with PID = " + pid);
+		var pid = parseInt(args[0]);
+		//_StdIn.putText("Kill process with PID = " + pid);
+		var process2Kill;
+		var slot;
+		var position;
+		
+		for (process in _ReadyQueue)
+		{
+			if(_ReadyQueue[process].pid === pid)
+			{
+				alert(pid);
+			}
+		}
 	}
 	else{
 		_StdIn.putText("Please enter a PID");
-	}
+	}*/
 }
 
 
