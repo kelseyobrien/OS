@@ -556,6 +556,7 @@ function shellRun(args){
 			//Begin executing
 			_CPU.isExecuting = true;
 			}
+			delete _ProgramsList[pid];
 	}
 	else{
 		_StdIn.putText("Please enter a pid.");
@@ -567,34 +568,13 @@ function shellKrnTrap(args){
 	krnTrapError("TEST: Kernal trapped OS error.");
 }
 
-function displayCPUData()
-{
-	var currentPC 		= document.getElementById("pc");
-	var currentACC 		= document.getElementById("acc");
-	var currentXReg 	= document.getElementById("xreg");
-	var currentYReg 	= document.getElementById("yreg");
-	var currentZFlag 	= document.getElementById("zflag");
-	
-	currentPC.innerHTML 	= "0x" + _CPU.PC.toString(16).toUpperCase();
-	currentACC.innerHTML 	= _CPU.Acc.toString(16).toUpperCase();
-	currentXReg.innerHTML 	= _CPU.Xreg.toString(16).toUpperCase();
-	currentYReg.innerHTML 	= _CPU.Yreg.toString(16).toUpperCase();
-	currentZFlag.innerHTML 	= _CPU.Zflag.toString(16).toUpperCase();
-}
-
-function clearCPU(){
-	_CPU.PC 	= 0;
-	_CPU.Acc 	= 0;
-	_CPU.Xreg 	= 0;
-	_CPU.Yreg	= 0;
-	_CPU.Zflag	= 0;
-}
-
 function shellRunAll(args){
 	var currProcess = null;
 	for ( i in _ProgramsList)
 	{
+		//Get program off resident list, delete it and add it to ready queue
 		currProcess = _ProgramsList[i];
+		delete _ProgramsList[i];
 		_ReadyQueue.enqueue(currProcess);
 	}
 	
@@ -607,8 +587,8 @@ function shellRunAll(args){
 function shellQuantum(args){
 	if (args.length > 0) 
 	{
-        var newQuantum = args[0];
-		if (isNaN(newQuantum) || newQuantum < 0){
+        var newQuantum = parseInt(args[0]);
+		if (isNaN(newQuantum) || newQuantum <= 0){
 			_StdIn.putText("Sorry that is not a valid quantum...try again");
 		}
 		else{
@@ -619,7 +599,13 @@ function shellQuantum(args){
 }
 
 function shellActivePIDs(args){
-	if (_ProgramsList.length != 0){
+	var progListLen = 0;
+	
+	for(index in _ProgramsList){
+		progListLen++;
+	}
+
+	if (progListLen != 0){
 		_StdIn.putText("Active PIDS: ");
 		for (i in _ProgramsList){
 			//var currPID = _ProgramsList[i].pid;
@@ -635,25 +621,57 @@ function shellActivePIDs(args){
 }
 
 function shellKill(args){
-	/*if (args.length > 0)
+	if (args.length > 0)
 	{
 		var pid = parseInt(args[0]);
-		//_StdIn.putText("Kill process with PID = " + pid);
 		var process2Kill;
-		var slot;
-		var position;
+		var positionInQueue;
+		var base;
+		var limit;
 		
-		for (process in _ReadyQueue)
-		{
-			if(_ReadyQueue[process].pid === pid)
+		for ( i = 0; i < _ReadyQueue.getSize(); i++){
+			if (_ReadyQueue.getItem(i).pid === pid)
 			{
-				alert(pid);
+				process2Kill = _ReadyQueue.getItem(i);
+				slot = _ReadyQueue.getItem(i).base;
+				positionInQueue = parseInt(i);
 			}
+		}
+		
+		if (process2Kill){
+			_ReadyQueue.remove(positionInQueue);
+			switch(slot)
+			{
+				case _MemoryManager.mapOfMem.spaceOne.base:
+					base = _MemoryManager.mapOfMem.spaceOne.base;
+					limit = _MemoryManager.mapOfMem.spaceOne.limit;
+					_MemoryManager.mapOfMem.spaceOne.open = true;
+				break;
+				case _MemoryManager.mapOfMem.spaceTwo.base:
+					base = _MemoryManager.mapOfMem.spaceTwo.base;
+					limit = _MemoryManager.mapOfMem.spaceTwo.limit;
+					_MemoryManager.mapOfMem.spaceTwo.open = true;
+				break;
+				case _MemoryManager.mapOfMem.spaceThree.base:
+					base = _MemoryManager.mapOfMem.spaceThree.base;
+					limit = _MemoryManager.mapOfMem.spaceThree.limit;
+					_MemoryManager.mapOfMem.spaceThree.open = true;
+				break;
+			}
+			
+			_StdIn.putText("Process with pid " + pid + " has been removed!");
+			_StdIn.advanceLine();
+			
+			for( var i = base; i < limit; i++)
+			{
+				_MainMemory[i] = "00";
+			}
+			
 		}
 	}
 	else{
 		_StdIn.putText("Please enter a PID");
-	}*/
+	}
 }
 
 

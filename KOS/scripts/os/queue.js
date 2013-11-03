@@ -51,4 +51,8 @@ function Queue()
 	this.getItem = function(index) {
 		return this.q[index]
 	}
+	
+	this.remove = function(index){
+		this.q.splice(index, 1);
+	}
 }
