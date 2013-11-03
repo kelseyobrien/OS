@@ -96,6 +96,9 @@ function Cpu() {
 			case "FF" : sysCall();
 			break;
 			
+			default:	breakSysCall();
+			break;
+			
 			
 		}
 	}
@@ -123,8 +126,9 @@ function loadAccMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 
 	_CPU.PC++;
@@ -149,8 +153,9 @@ function storeAccMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 	
@@ -168,8 +173,9 @@ function addWCarry()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -195,8 +201,9 @@ function loadXMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 
@@ -223,8 +230,9 @@ function loadYMem()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -245,6 +253,7 @@ function breakSysCall()
 		_Scheduler.contextSwitch();
 	}
 	else { //No process waiting in the ready queue
+	updateReadyQueueDisplay();
 	_CPU.isExecuting = false;
 	}
 
@@ -268,8 +277,9 @@ function compToX()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -319,8 +329,9 @@ function incByte()
 	}
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
-		alert("here");
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
