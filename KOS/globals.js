@@ -18,7 +18,8 @@ var CPU_CLOCK_INTERVAL = 100;   // This is in ms, or milliseconds, so 1000 = 1 s
 
 var TIMER_IRQ = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                     // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
-var KEYBOARD_IRQ = 1;  
+var KEYBOARD_IRQ = 1;
+var MEMACCESS_IRQ = 2;  
 
 
 //
@@ -28,8 +29,6 @@ var _CPU = null;
 
 var _OSclock = 0;       // Page 23.
 
-var _Mode = 0;   // 0 = Kernel Mode, 1 = User Mode.  See page 21.
-
 var _Canvas = null;               // Initialized in hostInit().
 var _DrawingContext = null;       // Initialized in hostInit().
 var _DefaultFontFamily = "sans";  // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
@@ -37,17 +36,23 @@ var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;        // Additional space added to font size when advancing a line.
 
 var _MainMemory;
-var _TotalMemory = 256;		// Total memory space (will be 768 in the future)
+var _TotalMemory = 768;		// Total memory space (will be 768 in the future)
+var _PartitionSize = 256;
 var _PID = 0; 			// To keep track of which PIDs are already in use
 var _CurrentProcess = null;
 var _ProgramsList = null;
 var _PCBUpToDate = null;
+var _ReadyQueue = null;
+
+var _Scheduler = null;
+var ROUND_QUANTUM = 6;	//Default quantum
+var _Cycles = 1;		//To keep track of how many cycles have passed.
 
 //Process states
 var P_NEW 	= 0; // Process new
 var P_LOAD   	= 1; // Process loaded in memory
 var P_RUN 	= 2; // Process currently executing
-//var P_READY	= 3; // Process ready but waiting (will need this eventually)
+var P_READY	= 3; // Process ready but waiting (will need this eventually)
 var P_TERM 	= 4; // Process finished executing
 
 

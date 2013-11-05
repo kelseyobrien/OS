@@ -16,6 +16,7 @@
    <script type="text/javascript" src="scripts/host/devices.js"></script>
    <script type="text/javascript" src="scripts/host/cpu.js"></script>
    <script type="text/javascript" src="scripts/host/mainMemory.js"></script>
+   <script type="text/javascript" src="scripts/host/displays.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="scripts/os/interrupt.js"></script>
@@ -29,6 +30,7 @@
    <script type="text/javascript" src="scripts/os/programLoad.js"></script>
    <script type="text/javascript" src="scripts/os/pcb.js"></script>
    <script type="text/javascript" src="scripts/os/memoryManager.js"></script>
+   <script type="text/javascript" src="scripts/os/scheduler.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="scripts/utils.js"></script>
@@ -68,12 +70,29 @@
 					 value="Reset"
 					 tabindex="2"
 					 onclick="hostBtnReset_click(this);">
-			</div></td>
+			</div>
+			</td>
 			<td style = "color:white; font-weight:bold;">Control Log</td>
-			<td style = "color:white; font-weight:bold;">Task Bar</td>
+			<td style = "color:white; font-weight:bold;">CPU</td>
 		</tr>
 		<tr valign = "top">
-			<td><div class = "explore" id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+		
+			<td>
+			<div id="divtaskbar">
+				<table class = "taskbar"> 
+					<tr>
+						<td style="color:red; font-weight:bold;">Current Date and Time</td>
+						<td id = current width = "294" style="color:black;"></td>
+					</tr>
+					<tr>
+						<td style="color:red; font-weight:bold;">Status</td>
+						<td id = status width = "294" style="color:black;"></td>
+					</tr>		
+				</table>
+			</label>
+			</div>
+			
+			<div class = "explore" id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
 					<canvas class = "explore" id="display"
 						width="500px"
 						height="500px"
@@ -102,24 +121,8 @@
 					</label>
 				</div>
 			</td>
-			<td><div id="divtaskbar">
-				<table class = "taskbar"> 
-					<tr>
-						<td style="color:red; font-weight:bold;">Current Date and Time</td>
-						<td id = current width = "230" style="color:black;"></td>
-					</tr>
-					<tr>
-						<td style="color:red; font-weight:bold;">Status</td>
-						<td id = status width = "230" style="color:black;"></td>
-					</tr>		
-				</table>
-			</label>
-			</div>
-			<br><br>
+			<td>
 			<div id = "divCPUInfo">
-				<label>
-				CPU
-				<br>
 				<table class = "CPUInfo">
 					<tr style="color:red;">
 						<td>PC</td>
@@ -141,14 +144,44 @@
 				<br><br>
 				<div id = "divMemDisplay">
 					<label>Memory Display
-					<table class = "MemDisplay" id = "MemDisplay">
-					</table>
+						<table class = "MemDisplay" id = "MemDisplay">
+						</table>
 					</label>
-					</div>
+				</div>
+				<br><br>
+				<div id = "divReadyQueue">
+					<label> Ready Queue
+						<table class = "ReadyQueue" id = "ReadyQueue">
+						<tr style="color:red;">
+							<td width = "50">PID</td>
+							<td width = "90">State</td>
+							<td width = "82">Base</td>
+							<td width = "82">Limit</td>
+						</tr>
+						<tr height = "30" style = "color: black;">
+							<td name = "RQ1"></td>
+							<td name = "RQ1"></td>
+							<td name = "RQ1"></td>
+							<td name = "RQ1"></td>
+						</tr>
+						<tr height = "30" style = "color: black;">
+							<td name = "RQ2"></td>
+							<td name = "RQ2"></td>
+							<td name = "RQ2"></td>
+							<td name = "RQ2"></td>
+						</tr>
+						<tr height = "30" style = "color: black;">
+							<td name = "RQ3"></td>
+							<td name = "RQ3"></td>
+							<td name = "RQ3"></td>
+							<td name = "RQ3"></td>
+						</tr>
+						</table>
+					</label>
+				</div>
 			</td>
 		</tr>
-		
-		<tr>
+
 	</tbody>
 	</table>
 

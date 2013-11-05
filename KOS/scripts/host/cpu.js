@@ -29,26 +29,42 @@ function Cpu() {
         this.Zflag = 0;      
         this.isExecuting = false;  
     };
+	
+	this.update = function(pc, acc, x, y, z)
+	{
+		this.PC    = pc;
+        this.Acc   = acc;
+        this.Xreg  = x;
+        this.Yreg  = y;
+        this.Zflag = z;
+	}
     
     this.cycle = function() {
 		this.execute(this.fetch());
         krnTrace("CPU cycle");
+		if (_Cycles > ROUND_QUANTUM){
+			_Scheduler.contextSwitch();
+		}
+		//Increment cycle counter
+		_Cycles++;
 		
 		//Update display every cycle
 		displayCPUData();
 		updateTable();
-		//displayMemory();
+
         // TODO: Accumulate CPU usage and profiling statistics here.
         // Do the real work here. Be sure to set this.isExecuting appropriately.
     };
 	
 	this.fetch = function(){
-		var relocation = _MemoryManager.getRelocationValue() + this.PC;
-		return _MainMemory[relocation];
+		var relocation = _MemoryManager.getRelocationValue();
+		//alert(relocation + this.PC);
+		return _MainMemory[this.PC + relocation];
 	}
 	
 	this.execute = function(code)
 	{
+		//alert(code);
 		switch(code)
 		{
 			case "A9" : loadAccConst();
@@ -80,6 +96,9 @@ function Cpu() {
 			case "FF" : sysCall();
 			break;
 			
+			default:	breakSysCall();
+			break;
+			
 			
 		}
 	}
@@ -98,7 +117,7 @@ function loadAccMem()
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
 	//Concatinate bytes
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -108,6 +127,8 @@ function loadAccMem()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 
 	_CPU.PC++;
@@ -118,7 +139,7 @@ function storeAccMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		var hexAcc = _CPU.Acc.toString(16).toUpperCase();
@@ -133,6 +154,8 @@ function storeAccMem()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 	
@@ -143,7 +166,7 @@ function addWCarry()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		_CPU.Acc += parseInt(_MainMemory[decAddr], 16);
@@ -151,6 +174,8 @@ function addWCarry()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -167,7 +192,7 @@ function loadXMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -177,6 +202,8 @@ function loadXMem()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 
@@ -194,7 +221,7 @@ function loadYMem()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -204,6 +231,8 @@ function loadYMem()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -217,30 +246,17 @@ function noOp()
 //00 = break or system call
 function breakSysCall()
 {
-	_PCBUpToDate.pc 	= _CPU.PC.toString(16).toUpperCase();
-	_PCBUpToDate.acc	= _CPU.Acc.toString(16).toUpperCase();
-	_PCBUpToDate.x		= _CPU.Xreg.toString(16).toUpperCase();
-	_PCBUpToDate.y		= _CPU.Yreg.toString(16).toUpperCase();
-	_PCBUpToDate.z		= _CPU.Zflag.toString(16).toUpperCase();
-	_PCBUpToDate.state 	= P_TERM;
-	
-	var str1 = "PCB [pid: " + _PCBUpToDate.pid + 
-					", base: " + _PCBUpToDate.base + 
-					", limit : " + _PCBUpToDate.limit +
-					", pc : " + _PCBUpToDate.pc +
-					", acc : " + _PCBUpToDate.acc + ",";
-	
-	var str2 = "x reg : " + _PCBUpToDate.x +
-				", y reg : " + _PCBUpToDate.y +
-				", z flag : " + _PCBUpToDate.z + "]";
-	_StdIn.putText(str1);
-	_StdIn.advanceLine();
-	
-	_StdIn.putText(str2);
-	_StdIn.advanceLine();
-	_StdIn.putText(">");
-	
+	_CurrentProcess.update(P_TERM,  _CPU.PC, _CPU.Acc, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+	//If there is process waiting in ready queue -> context switch
+	if(_ReadyQueue.getSize() >= 1)
+	{
+		_Scheduler.contextSwitch();
+	}
+	else { //No process waiting in the ready queue
+	updateReadyQueueDisplay();
 	_CPU.isExecuting = false;
+	}
+
 }
 
 //EC = compare byte in memory to X reg
@@ -249,7 +265,7 @@ function compToX()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 	if (_MemoryManager.isValidAddress(decAddr))
 	{
 		if(_CPU.Xreg === parseInt(_MainMemory[decAddr])){
@@ -262,6 +278,8 @@ function compToX()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -289,7 +307,7 @@ function incByte()
 {
 	var byte1 = _MemoryManager.getNextByte();
 	var byte2 = _MemoryManager.getNextByte();
-	var decAddr = parseInt((byte2 + byte1), 16);
+	var decAddr = parseInt((byte2 + byte1), 16) + _MemoryManager.getRelocationValue();
 
 	//If address is a valid address for this process put it in Acc
 	if (_MemoryManager.isValidAddress(decAddr))
@@ -312,6 +330,8 @@ function incByte()
 	else{	//Address is not valid: shut down OS and log event
 		krnShutdown();
 		krnTrace("The requested address is not valid");
+		
+		//krnInterrupHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -330,7 +350,7 @@ function sysCall()
 		_StdIn.putText(">");
 	}
 	else if (_CPU.Xreg === 2){
-		var strAddr = _CPU.Yreg;
+		var strAddr = _CPU.Yreg + _MemoryManager.getRelocationValue();
 		var currentByte = _MainMemory[strAddr];
 		var keyCode = 0;
 		var chr = "";

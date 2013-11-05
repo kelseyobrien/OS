@@ -118,6 +118,12 @@ function hostBtnStartOS_click(btn)
 	//Up to date PCB
 	_PCBUpToDate = new PCB;
 	
+	//Create Ready Queus
+	_ReadyQueue = new Queue();
+	
+	//Create Scheduler
+	_Scheduler = new Scheduler();
+	
 	createTable();
 	
 	// .. and call the OS Kernel Bootstrap routine.
