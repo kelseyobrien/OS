@@ -133,8 +133,9 @@ function krnInterruptHandler(irq, params)    // This is the Interrupt Handler Ro
             krnKeyboardDriver.isr(params);   // Kernel mode device driver
             _StdIn.handleInput();
             break;
-		//case MEMACCESS_IRQ:
-			//krnMemAccessISR();
+		case MEMACCESS_IRQ:
+			krnMemAccessISR();
+			break;
         default: 
             krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
     }
@@ -146,9 +147,14 @@ function krnTimerISR()  // The built-in TIMER (not clock) Interrupt Service Rout
 } 
 
 function krnMemAccessISR(){
-	breakSysCall();
-	krnTrace("Memory Access Violation");
-
+	hostLog("Memory Access Violation", "OS");
+	
+	_CurrentProcess.update(P_TERM,  _CPU.PC, _CPU.Acc, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+	
+	_CPU.isExecuting = false;
+	
+	_Scheduler.contextSwitch();
+	
 }  
 
 

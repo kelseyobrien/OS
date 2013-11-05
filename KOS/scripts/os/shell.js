@@ -623,7 +623,7 @@ function shellActivePIDs(args){
 function shellKill(args){
 	if (args.length > 0)
 	{
-		var pid = parseInt(args[0]);
+		var pid = parseInt(args);
 		var process2Kill;
 		var positionInQueue;
 		var base;
@@ -659,7 +659,7 @@ function shellKill(args){
 				break;
 			}
 			
-			_StdIn.putText("Process with pid " + pid + " has been removed!");
+			_StdIn.putText("Process with pid " + pid + " has been removed.");
 			_StdIn.advanceLine();
 			
 			for( var i = base; i < limit; i++)
