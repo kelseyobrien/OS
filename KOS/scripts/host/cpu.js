@@ -58,13 +58,11 @@ function Cpu() {
 	
 	this.fetch = function(){
 		var relocation = _MemoryManager.getRelocationValue();
-		//alert(relocation + this.PC);
 		return _MainMemory[this.PC + relocation];
 	}
 	
 	this.execute = function(code)
 	{
-		//alert(code);
 		switch(code)
 		{
 			case "A9" : loadAccConst();
@@ -96,7 +94,7 @@ function Cpu() {
 			case "FF" : sysCall();
 			break;
 			
-			default:	breakSysCall();
+			default	:	krnInterruptHandler(INVALIDOP_IRQ);
 			break;
 			
 			
@@ -125,10 +123,10 @@ function loadAccMem()
 		_CPU.Acc = parseInt(_MainMemory[decAddr]);
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 
 	_CPU.PC++;
@@ -152,10 +150,10 @@ function storeAccMem()
 		_MainMemory[decAddr] = hexAcc;
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 	
@@ -172,10 +170,10 @@ function addWCarry()
 		_CPU.Acc += parseInt(_MainMemory[decAddr], 16);
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -200,10 +198,10 @@ function loadXMem()
 		_CPU.Xreg = parseInt(_MainMemory[decAddr]);
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 
@@ -229,10 +227,10 @@ function loadYMem()
 		_CPU.Yreg = parseInt(_MainMemory[decAddr]);
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -253,8 +251,8 @@ function breakSysCall()
 		_Scheduler.contextSwitch();
 	}
 	else { //No process waiting in the ready queue
-	updateReadyQueueDisplay();
-	_CPU.isExecuting = false;
+		updateReadyQueueDisplay();
+		_CPU.isExecuting = false;
 	}
 
 }
@@ -276,10 +274,10 @@ function compToX()
 		}
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }
@@ -328,10 +326,10 @@ function incByte()
 		_MainMemory[decAddr] = hexValue;
 	}
 	else{	//Address is not valid: shut down OS and log event
-		krnShutdown();
-		krnTrace("The requested address is not valid");
+		//krnShutdown();
+		//krnTrace("The requested address is not valid");
 		
-		//krnInterrupHandler(MEMACCESS_IRQ);
+		krnInterruptHandler(MEMACCESS_IRQ);
 	}
 	_CPU.PC++;
 }

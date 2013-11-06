@@ -11,7 +11,7 @@ function Scheduler()
 			krnTrace("Performing context switch");
 			
 			//Update current process PCB to current state of CPU
-			//Add it back to readu queue if it had not terminated
+			//Add it back to readuy queue if it had not terminated
 			if(_CurrentProcess.state != P_TERM){
 				_CurrentProcess.update(P_READY, _CPU.PC,  _CPU.Acc,
 										 _CPU.Xreg,  _CPU.Yreg,  _CPU.Zflag);
@@ -20,12 +20,17 @@ function Scheduler()
 			
 			//Get next process to execute
 			_CurrentProcess = _ReadyQueue.dequeue();
-			
+			clearCPU();
 			//Update CPU to new process values
 			_CPU.update(_CurrentProcess.pc, _CurrentProcess.acc,
 						_CurrentProcess.x, _CurrentProcess.y, _CurrentProcess.z);
+
+			if (!_CPU.isExecuting)
+            {
+                _CPU.isExecuting = true;
+            }
 		}
 		//Reset cycle counter
 		_Cycles = 1;
-	}
+	};
 }
