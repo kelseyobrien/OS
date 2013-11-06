@@ -94,7 +94,7 @@ function Cpu() {
 			case "FF" : sysCall();
 			break;
 			
-			default:	breakSysCall();
+			default	:	krnInterruptHandler(INVALIDOP_IRQ);
 			break;
 			
 			
@@ -251,8 +251,8 @@ function breakSysCall()
 		_Scheduler.contextSwitch();
 	}
 	else { //No process waiting in the ready queue
-	updateReadyQueueDisplay();
-	_CPU.isExecuting = false;
+		updateReadyQueueDisplay();
+		_CPU.isExecuting = false;
 	}
 
 }

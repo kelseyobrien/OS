@@ -20,6 +20,7 @@ var TIMER_IRQ = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prio
                     // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
 var MEMACCESS_IRQ = 2;  
+var INVALIDOP_IRQ = 3;
 
 
 //

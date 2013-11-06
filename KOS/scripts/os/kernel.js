@@ -136,6 +136,9 @@ function krnInterruptHandler(irq, params)    // This is the Interrupt Handler Ro
 		case MEMACCESS_IRQ:
 			krnMemAccessISR();
 			break;
+		case INVALIDOP_IRQ:
+			krnInvalidOpISR();
+			break;
         default: 
             krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
     }
@@ -155,7 +158,17 @@ function krnMemAccessISR(){
 	
 	_Scheduler.contextSwitch();
 	
-}  
+} 
+
+function krnInvalidOpISR(){
+	hostLog("Invalid op code", "OS");
+	
+	_CurrentProcess.update(P_TERM,  _CPU.PC, _CPU.Acc, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+	
+	_CPU.isExecuting = false;
+	
+	_Scheduler.contextSwitch();
+}
 
 
 
