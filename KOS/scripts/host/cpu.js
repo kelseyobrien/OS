@@ -290,8 +290,8 @@ function branchXBytes()
 		var branch = parseInt(_MemoryManager.getNextByte(), 16);
 		//Branch PC
 		_CPU.PC += branch;
-		if(_CPU.PC > 255){
-			_CPU.PC -= 256;
+		if(_CPU.PC >= _PartitionSize){
+			_CPU.PC -= _PartitionSize;
 		}
 		_CPU.PC++;
 	}
