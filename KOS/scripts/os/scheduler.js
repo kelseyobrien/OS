@@ -1,7 +1,8 @@
 function Scheduler()
 {
-	//Round Robin default quantum = 6
+	//Round Robin algorithm by default with quantum = 6
 	this.quantum = ROUND_QUANTUM
+	this.algorithm = ROUNDR;
 	
 	this.contextSwitch = function()
 	{

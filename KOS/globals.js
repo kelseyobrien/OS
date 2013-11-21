@@ -56,6 +56,10 @@ var P_RUN 	= 2; // Process currently executing
 var P_READY	= 3; // Process ready but waiting (will need this eventually)
 var P_TERM 	= 4; // Process finished executing
 
+//Constants for Scheduling Algorithms
+var ROUNDR 	 = 0;
+var FCFS	 = 1;
+var PRIORITY = 2;
 
 // Default the OS trace to be on.
 var _Trace = true;

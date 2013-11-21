@@ -154,6 +154,54 @@ function shellInit() {
     sc.function = shellKill;
     this.commandList[this.commandList.length] = sc;
 	
+	sc = new ShellCommand();
+    sc.command = "create";
+    sc.description = "<filename> - Create file.";
+    sc.function = shellCreate;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "read";
+    sc.description = "<filename> - Read file a display contents.";
+    sc.function = shellRead;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "write";
+    sc.description = "<filename data> - Write data to file specified.";
+    sc.function = shellWrite;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "delete";
+    sc.description = " <filename> - Delete filename from storage.";
+    sc.function = shellDelete;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "format";
+    sc.description = " - Initialize all block in all sectors in all tracks.";
+    sc.function = shellFormat;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "ls";
+    sc.description = " - List the files currently stored on the disk.";
+    sc.function = shellLS;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "setschedule";
+    sc.description = " [rr, fcfs, priority] - Set CPU scheduling algorithm.";
+    sc.function = shellSetSched;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "getschedule";
+    sc.description = " - Get currently selected scheduling algorithm.";
+    sc.function = shellGetSched;
+    this.commandList[this.commandList.length] = sc;
+	
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
 
@@ -624,7 +672,6 @@ function shellKill(args){
 	if (args.length > 0)
 	{
 		var pid = parseInt(args);
-		var process2Kill;
 		var positionInQueue;
 		var base;
 		var limit;
@@ -632,45 +679,116 @@ function shellKill(args){
 		for ( i = 0; i < _ReadyQueue.getSize(); i++){
 			if (_ReadyQueue.getItem(i).pid === pid)
 			{
-				process2Kill = _ReadyQueue.getItem(i);
 				slot = _ReadyQueue.getItem(i).base;
-				positionInQueue = parseInt(i);
+				_ReadyQueue.remove(i);
 			}
 		}
 		
-		if (process2Kill){
-			_ReadyQueue.remove(positionInQueue);
-			switch(slot)
-			{
-				case _MemoryManager.mapOfMem.spaceOne.base:
-					base = _MemoryManager.mapOfMem.spaceOne.base;
-					limit = _MemoryManager.mapOfMem.spaceOne.limit;
-					_MemoryManager.mapOfMem.spaceOne.open = true;
-				break;
-				case _MemoryManager.mapOfMem.spaceTwo.base:
-					base = _MemoryManager.mapOfMem.spaceTwo.base;
-					limit = _MemoryManager.mapOfMem.spaceTwo.limit;
-					_MemoryManager.mapOfMem.spaceTwo.open = true;
-				break;
-				case _MemoryManager.mapOfMem.spaceThree.base:
-					base = _MemoryManager.mapOfMem.spaceThree.base;
-					limit = _MemoryManager.mapOfMem.spaceThree.limit;
-					_MemoryManager.mapOfMem.spaceThree.open = true;
-				break;
-			}
-			
-			_StdIn.putText("Process with pid " + pid + " has been removed.");
-			_StdIn.advanceLine();
-			
-			for( var i = base; i < limit; i++)
-			{
-				_MainMemory[i] = "00";
-			}
+		if(_CurrentProcess.pid === pid){
+			slot = _CurrentProcess.base;
+			alert(slot);
+			_CurrentProcess.update(P_TERM, _CPU.PC, _CPU.Acc, _CPU.Xreg,
+								_CPU.Yreg, _CPU.Zflag);
+			_CPU.isExecuting = false;
+			_Scheduler.contextSwitch();
 			
 		}
+	
+		switch(slot)
+		{
+			case _MemoryManager.mapOfMem.spaceOne.base:
+				base = _MemoryManager.mapOfMem.spaceOne.base;
+				limit = _MemoryManager.mapOfMem.spaceOne.limit;
+				_MemoryManager.mapOfMem.spaceOne.open = true;
+			break;
+			case _MemoryManager.mapOfMem.spaceTwo.base:
+				base = _MemoryManager.mapOfMem.spaceTwo.base;
+				limit = _MemoryManager.mapOfMem.spaceTwo.limit;
+				_MemoryManager.mapOfMem.spaceTwo.open = true;
+			break;
+			case _MemoryManager.mapOfMem.spaceThree.base:
+				base = _MemoryManager.mapOfMem.spaceThree.base;
+				limit = _MemoryManager.mapOfMem.spaceThree.limit;
+				_MemoryManager.mapOfMem.spaceThree.open = true;
+			break;
+		}
+		
+		for( var i = base; i < limit; i++)
+		{
+			_MainMemory[i] = "00";
+		}
+			
+		_StdIn.putText("Process with pid " + pid + " has been removed.");
+		_StdIn.advanceLine();
+	
 	}
+	
 	else{
 		_StdIn.putText("Please enter a PID");
+	}
+}
+
+//Create the file specificed by user.
+function shellCreate(args){
+	var fileName = args[0];
+}
+
+//Read file specified by the user and display contents.
+function shellRead(args){
+	var fileToRead = args[0];
+}
+
+//Write data to file specified by user.
+function shellWrite(args){
+	var fileToWrite = args[0];
+	var data = args.join(" ");
+	//Remove file name from the data
+	data = data.substring(fileToWrite.length + 1);
+}
+
+//Delete file specified by the user.
+function shellDelete(args){
+	var fileToDelete = args[0];
+}
+
+//Format all blocks in all sectors in all tracks.
+function shellFormat(args){
+}
+
+//List the files currently stored on the disk.
+function shellLS(args){
+}
+
+//Set CPU scheduling algorithm.
+function shellSetSched(args){
+	var schedToSet = args[0];
+	
+	if (schedToSet === "rr"){
+		_Scheduler.algorithm = ROUNDR;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else if(schedToSet === "fcfs"){
+		_Scheduler.algorithm = FCFS;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else if(schedToSet === "priority"){
+		_Scheduler.algoritm = PRIORITY;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else {
+		_StdIn.putText("Set schedule failed, pleade try again.");
+	}
+}
+
+//Get currently selected scheduling algorithm
+function shellGetSched(args){
+	switch(_Scheduler.algorithm){
+		case 0 : _StdIn.putText("Current scheduling algorithm is Round Robin.");
+		break;
+		case 1 :  _StdIn.putText("Current scheduling algorithm is FCFS.");
+		break;
+		case 2:  _StdIn.putText("Current scheduling algorithm is Priority.");
+		break;
 	}
 }
 

@@ -42,9 +42,17 @@ function Cpu() {
     this.cycle = function() {
 		this.execute(this.fetch());
         krnTrace("CPU cycle");
-		if (_Cycles > ROUND_QUANTUM){
-			_Scheduler.contextSwitch();
+		if (_Scheduler.algorithm === ROUNDR){
+			if (_Cycles > ROUND_QUANTUM){
+				_Scheduler.contextSwitch();
+			}
 		}
+		else if (_Scheduler.algorithm === FCFS || _Scheduler.algorithm == PRIORITY){
+			if(_CurrentProcess.state === P_TERM){
+				_Scheduler.contextSwitch();
+			}
+		}
+		
 		//Increment cycle counter
 		_Cycles++;
 		
