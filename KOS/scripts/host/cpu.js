@@ -44,12 +44,12 @@ function Cpu() {
         krnTrace("CPU cycle");
 		if (_Scheduler.algorithm === ROUNDR){
 			if (_Cycles > ROUND_QUANTUM){
-				_Scheduler.contextSwitch();
+				krnInterruptHandler(CONTEXT_SWITCH);
 			}
 		}
 		else if (_Scheduler.algorithm === FCFS || _Scheduler.algorithm == PRIORITY){
 			if(_CurrentProcess.state === P_TERM){
-				_Scheduler.contextSwitch();
+				krnInterruptHandler(CONTEXT_SWITCH);
 			}
 		}
 		
@@ -256,7 +256,7 @@ function breakSysCall()
 	//If there is process waiting in ready queue -> context switch
 	if(_ReadyQueue.getSize() >= 1)
 	{
-		_Scheduler.contextSwitch();
+		krnInterruptHandler(CONTEXT_SWITCH);
 	}
 	else { //No process waiting in the ready queue
 		updateReadyQueueDisplay();

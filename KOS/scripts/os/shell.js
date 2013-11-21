@@ -690,7 +690,7 @@ function shellKill(args){
 			_CurrentProcess.update(P_TERM, _CPU.PC, _CPU.Acc, _CPU.Xreg,
 								_CPU.Yreg, _CPU.Zflag);
 			_CPU.isExecuting = false;
-			_Scheduler.contextSwitch();
+			krnInterruptHandler(CONTEXT_SWITCH);
 			
 		}
 	
