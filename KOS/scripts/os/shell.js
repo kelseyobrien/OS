@@ -731,6 +731,22 @@ function shellKill(args){
 //Create the file specificed by user.
 function shellCreate(args){
 	var fileName = args[0];
+	if(fileName)
+	{
+		if(krnFileSystemDriver.create)
+		{
+			_StdIn.putText("File named " + fileName + " created!");
+		}
+		else
+		{
+			_StdIn.putText("Create was unsuccessful.");
+			krnTrace("Create failed");
+		}
+	}
+	else
+	{
+		_StdIn.putText("Please enter a file name to create.");
+	}
 }
 
 //Read file specified by the user and display contents.
@@ -749,10 +765,17 @@ function shellWrite(args){
 //Delete file specified by the user.
 function shellDelete(args){
 	var fileToDelete = args[0];
+	
 }
 
 //Format all blocks in all sectors in all tracks.
 function shellFormat(args){
+	if (krnFileSystemDriver.format()) {
+		_StdIn.putText("Format successful.");
+	}
+	else {
+		_StdIn.putText("Format was unsuccessful.");
+	}
 }
 
 //List the files currently stored on the disk.

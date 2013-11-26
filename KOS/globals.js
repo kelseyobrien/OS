@@ -83,6 +83,7 @@ var _SarcasticMode = false;
 
 // Global Device Driver Objects - page 12
 var krnKeyboardDriver = null;
+var krnFileSystemDriver = null;
 
 // For testing...
 var _GLaDOS = null;
@@ -93,3 +94,7 @@ var status = "OS is running";
 //To keep track of the user command history
 var _CommandHistory = [];
 var _IndexOfCurrentCommand = -1;
+
+//File System Constants
+var MBRKEY = "[0,0,0]";
+var NULLTSB = "[-1,-1,-1]";
