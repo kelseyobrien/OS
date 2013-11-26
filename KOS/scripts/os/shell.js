@@ -731,28 +731,65 @@ function shellKill(args){
 //Create the file specificed by user.
 function shellCreate(args){
 	var fileName = args[0];
-	if(fileName)
-	{
-		if(krnFileSystemDriver.create)
+	
+	//Can't create files unless the file system is formatted
+	if(krnFileSystemDriver.isFormatted){
+		if(fileName)
 		{
-			_StdIn.putText("File named " + fileName + " created!");
+			if(krnFileSystemDriver.create(fileName))
+			{
+				_StdIn.putText("File named " + fileName + " created!");
+			}
+			else
+			{
+				_StdIn.putText("Create was unsuccessful.");
+				krnTrace("Create failed");
+			}
 		}
 		else
 		{
-			_StdIn.putText("Create was unsuccessful.");
-			krnTrace("Create failed");
+			_StdIn.putText("Please enter a file name to create.");
 		}
 	}
 	else
 	{
-		_StdIn.putText("Please enter a file name to create.");
+		_StdIn.putText("File system must be formatted before files can be created.")
 	}
 }
 
 //Read file specified by the user and display contents.
 function shellRead(args){
 	var fileToRead = args[0];
+	
+	if(fileToRead)
+	{
+		var data = krnFileSystemDriver.read(fileToRead);
+		if(data.length > 0)
+		{
+			//Display data
+			for(var i = 0; i < data.length; i++)
+			{
+				if(i % 45 === 0)
+					_StdIn.advanceLine();
+				
+				_StdIn.putText(data.charAt(i));
+			}
+			_StdIn.advanceLine();
+			_StdIn.advanceLine();
+		}
+		else
+		{
+			_StdIn.putText("Read was not successful");
+		}
+	}
+	else
+	{
+		_StdIn.putText("Please specify a file name.");
+	}
+	
 }
+			
+
 
 //Write data to file specified by user.
 function shellWrite(args){
@@ -760,6 +797,31 @@ function shellWrite(args){
 	var data = args.join(" ");
 	//Remove file name from the data
 	data = data.substring(fileToWrite.length + 1);
+	
+	if(fileToWrite && data)
+	{
+		var write = krnFileSystemDriver.write(fileToWrite, data);
+		if (write)
+		{
+			_StdIn.putText("Write to " + fileToWrite + " was successful.");
+		}
+		else
+		{
+			_StdIn.putText("Write to " + fileToWrite + " was not successful.");
+		}
+	}
+	else
+	{
+		if(!fileToWrite)
+		{
+			_StdIn.putText("Please specify a filename.");
+		}
+		if(!data)
+		{
+			_StfIn.putText("Please specify data to write.");
+		}
+		
+	}
 }
 
 //Delete file specified by the user.
@@ -771,6 +833,7 @@ function shellDelete(args){
 //Format all blocks in all sectors in all tracks.
 function shellFormat(args){
 	if (krnFileSystemDriver.format()) {
+		krnFileSystemDriver.isFormatted = true;
 		_StdIn.putText("Format successful.");
 	}
 	else {

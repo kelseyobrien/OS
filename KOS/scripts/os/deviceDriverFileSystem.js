@@ -9,13 +9,14 @@ function DeviceDriverFileSystem()
 	//Base Methods
 	this.driverEntry = fileSystemDriverEntry;
 	this.isr = null;
+	this.isFormatted = false;
 	
 	//Main functions
 	this.format = fsFormat;
 	this.create = fsCreate;
 	this.write 	= fsWrite;
-	/*this.read 	= fsRead;
-	this.delete = fsDelete;
+	this.read 	= fsRead;
+	/*this.delete = fsDelete;
 	this.list 	= fsListFiles;*/
 }
 
@@ -55,6 +56,7 @@ function fsFormat()
 			}
 		}
 		localStorage[MBRKEY] = fileSystemValue(1, -1, -1, -1, "MBR");
+		
 		return true;
 	}
 	catch (error)
@@ -72,7 +74,7 @@ function fsCreate(fileName)
 	//Make sure there is a directory and block open and fileName < 10 characters
 	if (directoryKey && fileKey && fileName.length < 10)
 	{
-		localStorage[directoryKey] = setValueToUsed(fileKey, filename);
+		localStorage[directoryKey] = setValueToUsed(fileKey, fileName);
 		localStorage[fileKey] = setValueToUsed(NULLTSB, "");
 		
 		return true;	//Create was successful
@@ -86,11 +88,93 @@ function fsWrite(fileName, data)
 {
 	//Get directory associated with specified fileName
 	var directoryKey = getDirectory(fileName);
-	
+
 	 if(directoryKey)
 	 {
-		alert(true);
+		var TSBArr = JSON.parse(localStorage[directoryKey]);
+		
+		var track = TSBArr[1];
+		var sector = TSBArr[2];
+		var block = TSBArr[3];
+		
+		var fileKey = fileSystemKey(track, sector, block);
+		
+		if(data.length <= 60)
+		{
+			localStorage[fileKey] = fileSystemValue(1, -1, -1, -1, data);
+		}
+		else
+		{
+			var blocksNeeded = Math.ceil(data.length / 60);
+			var segments = [];
+			
+			for(var i = 0; i < blocksNeeded; i++)
+			{
+				segments[i] = data.substring((i * 60), ((i + 1) * 60));
+			}
+			
+			//Fill origin block
+			localStorage[fileKey] = setValueToUsed(NULLTSB, segments[0]);
+			
+			var currentKey = "";
+			var nextKey = fileKey;
+			
+			//Start at 1 because origin block is already full
+			for(var i = 1; i < segments.length; i++)
+			{
+				currentKey = nextKey;
+				//Get next open file block
+				nextKey = findOpenFileBlock();
+				localStorage[nextKey] = setValueToUsed(NULLTSB, segments[i]);
+				linkToParent(currentKey, nextKey);
+			}
+		}
+		return true;
 	 }
+	 else
+	 {
+		_StdIn.putText("File by the name " + fileName + " not found in file system.");
+		_StdIn.advanceLine();
+		return false;	//Write was not successful
+	 }
+}
+
+//Function to read a file from the file system
+function fsRead(fileName)
+{
+	var directoryKey = getDirectory(fileName);
+	if (directoryKey)
+	{
+		var TSBArr = JSON.parse(localStorage[directoryKey]);
+		var track = TSBArr[1];
+		var sector = TSBArr[2];
+		var block = TSBArr[3];
+		
+		var parentKey = fileSystemKey(track, sector, block);
+		
+		var linkedFiles = getAllLinkedFiles(parentKey);
+		
+		var valArr;
+		var data;
+		var dataList = [];
+		
+		for(index in linkedFiles)
+		{
+			valArr = JSON.parse(localStorage[linkedFiles[index]]);
+			data = valArr[4];
+			if(data.indexOf("~") != -1)
+			{
+				data = data.substring(0, data.indexOf("~"));
+			}
+			dataList.push(data);
+
+		}
+		return dataList.toString().replace(/,/g, "");
+	}
+	else
+	{
+		return false;
+	}
 }
 
 function fileSystemKey(track, sector, block)
@@ -127,7 +211,7 @@ function findOpenDirectoryBlock()
 		if (keyInt >= 0 && keyInt <= 77)
 		{
 			valueArr = JSON.parse(localStorage[key]);
-			usedBit = valueArr;
+			usedBit = valueArr[0];
 			
 			if (usedBit === 0)
 			{
@@ -201,6 +285,7 @@ function getDirectory(fileName)
 	
 	for(key in localStorage)
 	{
+		keyInt = cleanKey(key);
 		if (keyInt >= 0 && keyInt <= 77)
 		{
 			valueArr = JSON.parse(localStorage[key]);
@@ -210,7 +295,7 @@ function getDirectory(fileName)
 			if (used === 1)
 			{
 				//Get stored file name
-				storedName = data.substring(0, data.indexOf("`"));
+				storedName = data.substring(0, data.indexOf("~"));
 				//If file name is found return the key
 				if(fileName === storedName)
 				{
@@ -221,4 +306,46 @@ function getDirectory(fileName)
 	}
 	
 	return null;
+}
+
+function linkToParent(parentKey, childKey)
+{
+	//Get parent data needed
+	var parent = JSON.parse(localStorage[parentKey]);
+	var parentData = parent[4];
+	
+	//Get child data needed
+	var childWholeKey = JSON.parse(childKey);
+	var track = childWholeKey[0];
+	var sector = childWholeKey[1];
+	var block = childWholeKey[2];
+	
+	//Update parent with pointer to child
+	localStorage[parentKey] = fileSystemValue(1, track, sector, block, parentData);
+}
+
+function getAllLinkedFiles(parent)
+{
+	//Array of files --> make parent first element
+	var allFiles = [parent];
+	
+	currentKey = parent;
+	
+	while(currentKey != NULLTSB)
+	{
+		var valueArr = JSON.parse(localStorage[currentKey]);
+		var track = valueArr[1];
+		var sector = valueArr[2];
+		var block = valueArr[3];
+		
+		//Put key in correct format
+		var childKey = fileSystemKey(track, sector, block);
+		
+		if(childKey != NULLTSB)
+		{
+			allFiles.push(childKey);
+		}
+		currentKey = childKey;
+	}
+	return allFiles;
 }
