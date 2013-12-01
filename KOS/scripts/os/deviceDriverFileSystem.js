@@ -16,8 +16,8 @@ function DeviceDriverFileSystem()
 	this.create = fsCreate;
 	this.write 	= fsWrite;
 	this.read 	= fsRead;
-	/*this.delete = fsDelete;
-	this.list 	= fsListFiles;*/
+	this.delete = fsDelete;
+	//this.list 	= fsListFiles;
 }
 
 function fileSystemDriverEntry()
@@ -172,6 +172,36 @@ function fsRead(fileName)
 		return dataList.toString().replace(/,/g, "");
 	}
 	else
+	{
+		return false;
+	}
+}
+
+//Function to delete a file for the file system
+function fsDelete(fileName)
+{
+	try{
+		var directoryKey = getDirectory(fileName);
+		//Get track sector and block from directory key
+		var valArr = JSON.parse(localStorage[directoryKey]);
+		var track = valArr[1];
+		var sector = valArr[2];
+		var block = valArr[3];
+		
+		
+		//Set directory to unused
+		localStorage[directoryKey] = fileSystemValue(0, -1, -1, -1, "");
+
+		var parentKey = fileSystemKey(track, sector, block);
+		var linkedFiles = getAllLinkedFiles(parentKey);
+		
+		for(index in linkedFiles)
+		{
+			formatLine(linkedFiles[index]);
+		}
+		return true;
+	}
+	catch(error)
 	{
 		return false;
 	}
@@ -348,4 +378,9 @@ function getAllLinkedFiles(parent)
 		currentKey = childKey;
 	}
 	return allFiles;
+}
+
+function formatLine(key)
+{
+	localStorage[key] = fileSystemValue(0, -1, -1, -1, "");
 }

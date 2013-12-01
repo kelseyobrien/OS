@@ -828,6 +828,22 @@ function shellWrite(args){
 function shellDelete(args){
 	var fileToDelete = args[0];
 	
+	if(fileToDelete)
+	{
+		if (krnFileSystemDriver.delete(fileToDelete))
+		{
+			_StdIn.putText(fileToDelete + " has been deleted.");
+		}
+		else
+		{
+			_StdIn.putText("Deletion was not successful");
+		}
+	}
+	else
+	{
+		_StdIn.putText("Please enter a file to delete");
+	}
+	
 }
 
 //Format all blocks in all sectors in all tracks.
