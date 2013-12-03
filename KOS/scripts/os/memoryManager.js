@@ -28,7 +28,7 @@ function MemoryManager()
 	
 	this.getRelocationValue = function()
 	{
-		//Reture 0 for now because there is only one process
+		//Return 0 for now because there is only one process
 		return _CurrentProcess.base;
 	}
 	
@@ -87,29 +87,33 @@ function MemoryManager()
 	
 	this.reverseSpaceStatus = function(spaceBase)
 	{
-		if (spaceBase)
+		if (spaceBase >= 0)
 		{
-			if(spaceBase === this.mapOfMem.spaceOne.base)
+			if(spaceBase == _MemoryManager.mapOfMem.spaceOne.base)
 			{
-				if (this.mapOfMem.spaceOne.open === true)
-					this.mapOfMem.spaceOne.open = false;
-				else if(this.mapOfMem.spaceOne.open === false)
-					this.mapOfMem.spaceOne.open = true;
+				if (_MemoryManager.mapOfMem.spaceOne.open === true)
+					_MemoryManager.mapOfMem.spaceOne.open = false;
+				else if(_MemoryManager.mapOfMem.spaceOne.open === false)
+					_MemoryManager.mapOfMem.spaceOne.open = true;
 			}
-			else if(spaceBase === this.mapOfMem.spaceTwo.base)
+			else if(spaceBase === _MemoryManager.mapOfMem.spaceTwo.base)
 			{
-				if (this.mapOfMem.spaceTwo.open === true)
-					this.mapOfMem.spaceTwo.open = false;
-				else if(this.mapOfMem.spaceTwo.open === false)
-					this.mapOfMem.spaceTwo.open = true;
+				if (_MemoryManager.mapOfMem.spaceTwo.open === true)
+					_MemoryManager.mapOfMem.spaceTwo.open = false;
+				else if(_MemoryManager.mapOfMem.spaceTwo.open === false)
+					_MemoryManager.mapOfMem.spaceTwo.open = true;
 			}
-			if(spaceBase === this.mapOfMem.spaceThree.base)
+			else if(spaceBase === this.mapOfMem.spaceThree.base)
 			{
-				if (this.mapOfMem.spaceThree.open === true)
-					this.mapOfMem.spaceThree.open = false;
-				else if(this.mapOfMem.spaceThree.open === false)
-					this.mapOfMem.spaceThree.open = true;
+				if (_MemoryManager.mapOfMem.spaceThree.open === true)
+					_MemoryManager.mapOfMem.spaceThree.open = false;
+				else if(_MemoryManager.mapOfMem.spaceThree.open === false)
+					_MemoryManager.mapOfMem.spaceThree.open = true;
 			}
+		}
+		else
+		{
+			//do nothing
 		}
 	}
 	
@@ -166,7 +170,7 @@ function MemoryManager()
 		opcodeArr = opcodesFromFile.split(/\s/);
 		
 		var memSpace = _MemoryManager.getOpenSpace();
-		alert(memSpace.base);
+
 		process.base = memSpace.base;
 		process.limit = memSpace.limit;
 		process.state = P_LOAD;
