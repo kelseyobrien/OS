@@ -21,6 +21,17 @@ function Scheduler()
 			
 			//Get next process to execute
 			_CurrentProcess = _ReadyQueue.dequeue();
+			
+			if(_CurrentProcess.base === -1)
+			{
+				//Only roll out if there are processes still on RQ and there is no memory open
+				if(_ReadyQueue.getSize() != 0 && !_MemoryManager.openSpaceExists())
+				{
+					_MemoryManager.rollOut(_ReadyQueue.getItem(_ReadyQueue.getSize() - 1));
+				}
+				_MemoryManager.rollIn(_CurrentProcess);
+			}
+			
 			clearCPU();
 			//Update CPU to new process values
 			_CPU.update(_CurrentProcess.pc, _CurrentProcess.acc,

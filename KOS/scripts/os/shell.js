@@ -684,45 +684,49 @@ function shellKill(args){
 			}
 		}
 		
-		if(_CurrentProcess.pid === pid){
-			slot = _CurrentProcess.base;
-			alert(slot);
-			_CurrentProcess.update(P_TERM, _CPU.PC, _CPU.Acc, _CPU.Xreg,
-								_CPU.Yreg, _CPU.Zflag);
-			_CPU.isExecuting = false;
-			krnInterruptHandler(CONTEXT_SWITCH);
-			
-		}
-	
-		switch(slot)
+		if( slot === -1)
 		{
-			case _MemoryManager.mapOfMem.spaceOne.base:
-				base = _MemoryManager.mapOfMem.spaceOne.base;
-				limit = _MemoryManager.mapOfMem.spaceOne.limit;
-				_MemoryManager.mapOfMem.spaceOne.open = true;
-			break;
-			case _MemoryManager.mapOfMem.spaceTwo.base:
-				base = _MemoryManager.mapOfMem.spaceTwo.base;
-				limit = _MemoryManager.mapOfMem.spaceTwo.limit;
-				_MemoryManager.mapOfMem.spaceTwo.open = true;
-			break;
-			case _MemoryManager.mapOfMem.spaceThree.base:
-				base = _MemoryManager.mapOfMem.spaceThree.base;
-				limit = _MemoryManager.mapOfMem.spaceThree.limit;
-				_MemoryManager.mapOfMem.spaceThree.open = true;
-			break;
+			krnFileSystemDriver.delete("process " + pid.toString());
 		}
+		else{
+			if(_CurrentProcess.pid === pid){
+				slot = _CurrentProcess.base;
+				_CurrentProcess.update(P_TERM, _CPU.PC, _CPU.Acc, _CPU.Xreg,
+									_CPU.Yreg, _CPU.Zflag);
+				_CPU.isExecuting = false;
+				krnInterruptHandler(CONTEXT_SWITCH);
+				
+			}
 		
-		for( var i = base; i < limit; i++)
-		{
-			_MainMemory[i] = "00";
-		}
+			switch(slot)
+			{
+				case _MemoryManager.mapOfMem.spaceOne.base:
+					base = _MemoryManager.mapOfMem.spaceOne.base;
+					limit = _MemoryManager.mapOfMem.spaceOne.limit;
+					_MemoryManager.mapOfMem.spaceOne.open = true;
+				break;
+				case _MemoryManager.mapOfMem.spaceTwo.base:
+					base = _MemoryManager.mapOfMem.spaceTwo.base;
+					limit = _MemoryManager.mapOfMem.spaceTwo.limit;
+					_MemoryManager.mapOfMem.spaceTwo.open = true;
+				break;
+				case _MemoryManager.mapOfMem.spaceThree.base:
+					base = _MemoryManager.mapOfMem.spaceThree.base;
+					limit = _MemoryManager.mapOfMem.spaceThree.limit;
+					_MemoryManager.mapOfMem.spaceThree.open = true;
+				break;
+			}
 			
-		_StdIn.putText("Process with pid " + pid + " has been removed.");
-		_StdIn.advanceLine();
-	
+			for( var i = base; i < limit; i++)
+			{
+				_MainMemory[i] = "00";
+			}
+				
+			_StdIn.putText("Process with pid " + pid + " has been removed.");
+			_StdIn.advanceLine();
+		
+		}
 	}
-	
 	else{
 		_StdIn.putText("Please enter a PID");
 	}
@@ -859,6 +863,23 @@ function shellFormat(args){
 
 //List the files currently stored on the disk.
 function shellLS(args){
+	var fileList = krnFileSystemDriver.list();
+	
+	if(fileList)
+	{
+		_StdIn.putText("Files in the file system:");
+		_StdIn.advanceLine();
+		
+		for(index in fileList)
+		{
+			_StdIn.putText(fileList[index]);
+			_StdIn.advanceLine();
+		}
+	}
+	else
+	{
+		_StdIn.putText("There are no files in the file system");
+	}
 }
 
 //Set CPU scheduling algorithm.

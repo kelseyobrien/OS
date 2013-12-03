@@ -56,6 +56,7 @@ var P_LOAD   	= 1; // Process loaded in memory
 var P_RUN 	= 2; // Process currently executing
 var P_READY	= 3; // Process ready but waiting (will need this eventually)
 var P_TERM 	= 4; // Process finished executing
+var P_ON_DISK = 5; //Process in filesystem
 
 //Constants for Scheduling Algorithms
 var ROUNDR 	 = 0;

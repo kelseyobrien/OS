@@ -6,11 +6,9 @@
  */
  
  function loadProgram(userCode){
-	_PCBUpToDate = createProcess();
-	
-	if (typeof _PCBUpToDate != "undefined"){
-	
-	//Load user program into _MainMemory
+	if (_MemoryManager.openSpaceExists()){
+		_PCBUpToDate = createProcess();
+		//Load user program into _MainMemory
 		var opCode = userCode.split(/\s/);
 		
 		for (var i = _PCBUpToDate.base; i < opCode.length + _PCBUpToDate.base; i++){
@@ -28,6 +26,23 @@
 		//Update display and return PID
 		updateTable();
 		return _PCBUpToDate.pid;
+	}
+	//No open space exists to load into filesystem
+	else if(!_MemoryManager.openSpaceExists())
+	{
+		_PCBUpToDate = createProcess();
+		var processName = "process " + _PCBUpToDate.pid.toString();
+		
+		//Create file in filesystem and write program to it
+		krnFileSystemDriver.create(processName);
+		krnFileSystemDriver.write(processName, userCode);
+		
+		//Update process state
+		_PCBUpToDate.state = P_ON_DISK;
+		//Add process to programs list
+		_ProgramsList[_PCBUpToDate.pid] = _PCBUpToDate;
+		
+		return _PCBUpToDate.pid
 	}
 	else{
 		return undefined;
@@ -66,10 +81,10 @@
 		return (new PCB(pid, base, limit, PC, state));
 	}
 	else{
-		//_StdIn.putText("Sorry there is no space open")
-		return undefined;
+		base = -1;
+		limit = -1;
+		return (new PCB(pid, base, limit, PC, state));
 	}
-	
  }
  
  function getPID()

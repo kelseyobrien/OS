@@ -112,6 +112,8 @@ function translateState(state){
 		break;
 		case 4 : stateStr = "TERMINATED";
 		break;
+		case 5 : stateStr = "ON DISK";
+		break;
 	}
 	return stateStr;
 }

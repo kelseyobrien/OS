@@ -17,7 +17,7 @@ function DeviceDriverFileSystem()
 	this.write 	= fsWrite;
 	this.read 	= fsRead;
 	this.delete = fsDelete;
-	//this.list 	= fsListFiles;
+	this.list 	= fsListFiles;
 }
 
 function fileSystemDriverEntry()
@@ -207,6 +207,51 @@ function fsDelete(fileName)
 	}
 }
 
+function fsListFiles()
+{
+	var keyInt = 0;
+	var fileList = [];
+	var valArr;
+	var used;
+	var fileName;
+	
+	for(key in localStorage)
+	{
+		keyInt = cleanKey(key);
+		
+		if( keyInt > 0 && keyInt <= 77)
+		{
+			valArr = JSON.parse(localStorage[key]);
+			used = valArr[0];
+			
+			//If directory is used extract the file name
+			if( used ===1)
+			{
+				fileName = valArr[4];
+				//Get rid of any ~
+				if( fileName.indexOf("~" != -1))
+				{
+					fileName = fileName.substring(0, fileName.indexOf("~"));
+				}
+				//Add file name to the list
+				fileList.push(fileName);
+			}
+		}
+	}
+	
+	if (fileList.length > 0)
+	{
+		return fileList;
+	}
+	else
+	{
+		return null;
+	}
+				
+}
+
+
+//Helper functions to facilitate above functionality
 function fileSystemKey(track, sector, block)
 {
 	return JSON.stringify([track, sector, block]);
