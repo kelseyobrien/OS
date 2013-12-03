@@ -101,6 +101,7 @@ function krnOnCPUClockPulse()
     }
 	
 	updateReadyQueueDisplay();
+	updateFSTable();	
 }
 
 

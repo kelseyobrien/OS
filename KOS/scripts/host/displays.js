@@ -117,3 +117,49 @@ function translateState(state){
 	}
 	return stateStr;
 }
+
+function createFSTable()
+{
+	var FSTable = document.getElementById("FSDisplay");
+	
+	while(FSTable.hasChildNodes())
+	{
+		FSTable.removeChild(FSTable.firstChild);
+	}
+	
+	var rows = [];
+	var cells = [];
+	
+	for(var i = 0; i < localStorage.length; i++)
+	{
+		rows[i] = FSTable.insertRow(i);
+		rows[i].style.fontSize = "6.5pt";
+		
+		cells[i] = []
+		
+		for(var j = 0; j < 2; j++)
+		{
+			cells[i][j] = document.createElement((j ===0) ? "th" : "td");
+			if(j === 0)
+				cells[i][j].innerHTML = localStorage.key(i);
+			else
+				cells[i][j].innerHTML = "&nbsp;";
+				
+			rows[rows.length - 1].appendChild(cells[i][j]);
+		}
+	}
+	
+	
+}
+
+function updateFSTable()
+{
+	var table = document.getElementById("FSDisplay");
+	var row = 0;
+	
+	for(key in localStorage)
+	{
+		table[row][1].innerHTML = localStorage[key].replace(/\]|\[/g, "");
+		row++;
+	}
+}

@@ -126,6 +126,8 @@ function hostBtnStartOS_click(btn)
 	
 	createTable();
 	
+	createFSTable();
+	
 	// .. and call the OS Kernel Bootstrap routine.
     krnBootstrap();
 }

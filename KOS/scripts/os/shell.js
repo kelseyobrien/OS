@@ -542,14 +542,30 @@ function shellStatus(args){
 }
 
 function shellLoad(args){
-	//var validate = true;
+
+	var priority = -42; //Set to -42 just for fun (and because other things are set to that)
+	//If priority is specified store it
+	if(args[0])
+		priority = parseInt(args[0]);
+	
+	//Program entered in text box
 	var userInput = document.getElementById("taProgramInput").value.trim();
+	//Split into array of separate op codes
 	var allInput = userInput.split(" ");
+	
+	//Make sure that the array is not bigger than the partition size
 	if (allInput.length <= _PartitionSize){
+	
+		//Make sure program is valid hex
 		if (validateProgram(allInput) == true){
-			var pid = loadProgram(userInput);
+			var pid = loadProgram(userInput, priority);
 			if (typeof pid != "undefined"){
-			_StdIn.putText("Process loaded into memory with PID " + pid);
+				_StdIn.putText("Process loaded into memory with PID " + pid);
+				if(priority != -42)
+				{
+					_StdIn.advanceLine();
+					_StdIn.putText("with priority value of " + priority);
+				}
 			}
 			else {
 				_StdIn.putText("Sorry there is no space open");
@@ -597,7 +613,7 @@ function shellRun(args){
 			_CurrentProcess = _ProgramsList[pid];
 			_CurrentProcess.state = P_RUN;
 			
-			_ReadyQueue.enqueue(_CurrentProcess);
+			_ReadyQueue.enqueue(_CurrentProcess, _CurrentProcess.priority);
 			_ReadyQueue.dequeue();
 			//Clear CPU before executing
 			clearCPU();
@@ -623,7 +639,7 @@ function shellRunAll(args){
 		//Get program off resident list, delete it and add it to ready queue
 		currProcess = _ProgramsList[i];
 		delete _ProgramsList[i];
-		_ReadyQueue.enqueue(currProcess);
+		_ReadyQueue.enqueue(currProcess, currProcess.priority);
 	}
 	
 		_CurrentProcess = _ReadyQueue.dequeue();
@@ -732,7 +748,7 @@ function shellKill(args){
 	}
 }
 
-//Create the file specificed by user.
+//Create the file specified by user.
 function shellCreate(args){
 	var fileName = args[0];
 	
@@ -765,30 +781,37 @@ function shellCreate(args){
 function shellRead(args){
 	var fileToRead = args[0];
 	
-	if(fileToRead)
-	{
-		var data = krnFileSystemDriver.read(fileToRead);
-		if(data.length > 0)
+	//File system must be formatted before any operations can be performed
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToRead)
 		{
-			//Display data
-			for(var i = 0; i < data.length; i++)
+			var data = krnFileSystemDriver.read(fileToRead);
+			if(data.length > 0)
 			{
-				if(i % 45 === 0)
-					_StdIn.advanceLine();
-				
-				_StdIn.putText(data.charAt(i));
+				//Display data
+				for(var i = 0; i < data.length; i++)
+				{
+					if(i % 45 === 0)
+						_StdIn.advanceLine();
+					
+					_StdIn.putText(data.charAt(i));
+				}
+				_StdIn.advanceLine();
+				_StdIn.advanceLine();
 			}
-			_StdIn.advanceLine();
-			_StdIn.advanceLine();
+			else
+			{
+				_StdIn.putText("Read was not successful");
+			}
 		}
 		else
 		{
-			_StdIn.putText("Read was not successful");
+			_StdIn.putText("Please specify a file name.");
 		}
 	}
 	else
 	{
-		_StdIn.putText("Please specify a file name.");
+		_StdIn.putText("File system must be formatted before performing operations.")
 	}
 	
 }
@@ -802,29 +825,37 @@ function shellWrite(args){
 	//Remove file name from the data
 	data = data.substring(fileToWrite.length + 1);
 	
-	if(fileToWrite && data)
-	{
-		var write = krnFileSystemDriver.write(fileToWrite, data);
-		if (write)
+	//File system must be formatted before any operations can be performed
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToWrite && data)
 		{
-			_StdIn.putText("Write to " + fileToWrite + " was successful.");
+			alert("if");
+			var write = krnFileSystemDriver.write(fileToWrite, data);
+			if (write)
+			{
+				_StdIn.putText("Write to " + fileToWrite + " was successful.");
+			}
+			else
+			{
+				_StdIn.putText("Write to " + fileToWrite + " was not successful.");
+			}
 		}
 		else
 		{
-			_StdIn.putText("Write to " + fileToWrite + " was not successful.");
+			if(!fileToWrite)
+			{
+				_StdIn.putText("Please specify a filename.");
+			}
+			if(!data )
+			{
+				_StdIn.putText("Please specify data to write.");
+			}
+			
 		}
 	}
 	else
 	{
-		if(!fileToWrite)
-		{
-			_StdIn.putText("Please specify a filename.");
-		}
-		if(!data)
-		{
-			_StfIn.putText("Please specify data to write.");
-		}
-		
+		_StdIn.putText("File system must be formatted before performing operations.")
 	}
 }
 
@@ -832,20 +863,27 @@ function shellWrite(args){
 function shellDelete(args){
 	var fileToDelete = args[0];
 	
-	if(fileToDelete)
-	{
-		if (krnFileSystemDriver.delete(fileToDelete))
+	//File system must be formatted before performing any operations
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToDelete)
 		{
-			_StdIn.putText(fileToDelete + " has been deleted.");
+			if (krnFileSystemDriver.delete(fileToDelete))
+			{
+				_StdIn.putText(fileToDelete + " has been deleted.");
+			}
+			else
+			{
+				_StdIn.putText("Deletion was not successful");
+			}
 		}
 		else
 		{
-			_StdIn.putText("Deletion was not successful");
+			_StdIn.putText("Please enter a file to delete");
 		}
 	}
 	else
 	{
-		_StdIn.putText("Please enter a file to delete");
+		_StdIn.putText("File system must be formatted before performing operations.")
 	}
 	
 }

@@ -5,9 +5,9 @@
  *	from "User Program Input" into main memory.
  */
  
- function loadProgram(userCode){
+ function loadProgram(userCode, priority){
 	if (_MemoryManager.openSpaceExists()){
-		_PCBUpToDate = createProcess();
+		_PCBUpToDate = createProcess(priority);
 		//Load user program into _MainMemory
 		var opCode = userCode.split(/\s/);
 		
@@ -50,7 +50,7 @@
  }
  
  
- function createProcess()
+ function createProcess(priority)
  {
 	//All info needed to create new PCB
 	var pid = getPID();
@@ -83,7 +83,7 @@
 	else{
 		base = -1;
 		limit = -1;
-		return (new PCB(pid, base, limit, PC, state));
+		return (new PCB(pid, base, limit, PC, state, priority));
 	}
  }
  
