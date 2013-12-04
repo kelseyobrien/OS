@@ -99,3 +99,6 @@ var _IndexOfCurrentCommand = -1;
 //File System Constants
 var MBRKEY = "[0,0,0]";
 var NULLTSB = "[-1,-1,-1]";
+
+//Help with display of filesystem
+var _FSDisplay = null;

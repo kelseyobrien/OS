@@ -133,23 +133,25 @@ function createFSTable()
 	for(var i = 0; i < localStorage.length; i++)
 	{
 		rows[i] = FSTable.insertRow(i);
-		rows[i].style.fontSize = "6.5pt";
+		rows[i].style.fontSize = "8pt";
 		
 		cells[i] = []
 		
 		for(var j = 0; j < 2; j++)
 		{
 			cells[i][j] = document.createElement((j ===0) ? "th" : "td");
-			if(j === 0)
+			if(j === 0){
 				cells[i][j].innerHTML = localStorage.key(i);
-			else
+				}
+			else{
 				cells[i][j].innerHTML = "&nbsp;";
-				
+				cells[i][j].style.color = "black";	
+				}
+					
 			rows[rows.length - 1].appendChild(cells[i][j]);
 		}
 	}
-	
-	
+	_FSDisplay = cells;
 }
 
 function updateFSTable()
@@ -159,7 +161,8 @@ function updateFSTable()
 	
 	for(key in localStorage)
 	{
-		table[row][1].innerHTML = localStorage[key].replace(/\]|\[/g, "");
+		//alert(key);
+		table.rows[row].cells[1].innerHTML = localStorage[key].replace(/\]|\[/g, "");
 		row++;
 	}
 }

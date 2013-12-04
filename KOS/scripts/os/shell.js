@@ -829,7 +829,6 @@ function shellWrite(args){
 	if(krnFileSystemDriver.isFormatted){
 		if(fileToWrite && data)
 		{
-			alert("if");
 			var write = krnFileSystemDriver.write(fileToWrite, data);
 			if (write)
 			{
