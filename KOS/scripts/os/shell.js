@@ -154,6 +154,54 @@ function shellInit() {
     sc.function = shellKill;
     this.commandList[this.commandList.length] = sc;
 	
+	sc = new ShellCommand();
+    sc.command = "create";
+    sc.description = "<filename> - Create file.";
+    sc.function = shellCreate;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "read";
+    sc.description = "<filename> - Read file a display contents.";
+    sc.function = shellRead;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "write";
+    sc.description = "<filename data> - Write data to file specified.";
+    sc.function = shellWrite;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "delete";
+    sc.description = " <filename> - Delete filename from storage.";
+    sc.function = shellDelete;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "format";
+    sc.description = " - Initialize all block in all sectors in all tracks.";
+    sc.function = shellFormat;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "ls";
+    sc.description = " - List the files currently stored on the disk.";
+    sc.function = shellLS;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "setschedule";
+    sc.description = " [rr, fcfs, priority] - Set CPU scheduling algorithm.";
+    sc.function = shellSetSched;
+    this.commandList[this.commandList.length] = sc;
+	
+	sc = new ShellCommand();
+    sc.command = "getschedule";
+    sc.description = " - Get currently selected scheduling algorithm.";
+    sc.function = shellGetSched;
+    this.commandList[this.commandList.length] = sc;
+	
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
 
@@ -494,14 +542,30 @@ function shellStatus(args){
 }
 
 function shellLoad(args){
-	//var validate = true;
+
+	var priority = -42; //Set to -42 just for fun (and because other things are set to that)
+	//If priority is specified store it
+	if(args[0])
+		priority = parseInt(args[0]);
+	
+	//Program entered in text box
 	var userInput = document.getElementById("taProgramInput").value.trim();
+	//Split into array of separate op codes
 	var allInput = userInput.split(" ");
+	
+	//Make sure that the array is not bigger than the partition size
 	if (allInput.length <= _PartitionSize){
+	
+		//Make sure program is valid hex
 		if (validateProgram(allInput) == true){
-			var pid = loadProgram(userInput);
+			var pid = loadProgram(userInput, priority);
 			if (typeof pid != "undefined"){
-			_StdIn.putText("Process loaded into memory with PID " + pid);
+				_StdIn.putText("Process loaded into memory with PID " + pid);
+				if(priority != -42)
+				{
+					_StdIn.advanceLine();
+					_StdIn.putText("with priority value of " + priority);
+				}
 			}
 			else {
 				_StdIn.putText("Sorry there is no space open");
@@ -549,7 +613,7 @@ function shellRun(args){
 			_CurrentProcess = _ProgramsList[pid];
 			_CurrentProcess.state = P_RUN;
 			
-			_ReadyQueue.enqueue(_CurrentProcess);
+			_ReadyQueue.enqueue(_CurrentProcess, _CurrentProcess.priority);
 			_ReadyQueue.dequeue();
 			//Clear CPU before executing
 			clearCPU();
@@ -575,7 +639,7 @@ function shellRunAll(args){
 		//Get program off resident list, delete it and add it to ready queue
 		currProcess = _ProgramsList[i];
 		delete _ProgramsList[i];
-		_ReadyQueue.enqueue(currProcess);
+		_ReadyQueue.enqueue(currProcess, currProcess.priority);
 	}
 	
 		_CurrentProcess = _ReadyQueue.dequeue();
@@ -624,7 +688,6 @@ function shellKill(args){
 	if (args.length > 0)
 	{
 		var pid = parseInt(args);
-		var process2Kill;
 		var positionInQueue;
 		var base;
 		var limit;
@@ -632,14 +695,25 @@ function shellKill(args){
 		for ( i = 0; i < _ReadyQueue.getSize(); i++){
 			if (_ReadyQueue.getItem(i).pid === pid)
 			{
-				process2Kill = _ReadyQueue.getItem(i);
 				slot = _ReadyQueue.getItem(i).base;
-				positionInQueue = parseInt(i);
+				_ReadyQueue.remove(i);
 			}
 		}
 		
-		if (process2Kill){
-			_ReadyQueue.remove(positionInQueue);
+		if( slot === -1)
+		{
+			krnFileSystemDriver.delete("process " + pid.toString());
+		}
+		else{
+			if(_CurrentProcess.pid === pid){
+				slot = _CurrentProcess.base;
+				_CurrentProcess.update(P_TERM, _CPU.PC, _CPU.Acc, _CPU.Xreg,
+									_CPU.Yreg, _CPU.Zflag);
+				_CPU.isExecuting = false;
+				krnInterruptHandler(CONTEXT_SWITCH);
+				
+			}
+		
 			switch(slot)
 			{
 				case _MemoryManager.mapOfMem.spaceOne.base:
@@ -659,18 +733,222 @@ function shellKill(args){
 				break;
 			}
 			
-			_StdIn.putText("Process with pid " + pid + " has been removed.");
-			_StdIn.advanceLine();
-			
 			for( var i = base; i < limit; i++)
 			{
 				_MainMemory[i] = "00";
 			}
-			
+				
+			_StdIn.putText("Process with pid " + pid + " has been removed.");
+			_StdIn.advanceLine();
+		
 		}
 	}
 	else{
 		_StdIn.putText("Please enter a PID");
+	}
+}
+
+//Create the file specified by user.
+function shellCreate(args){
+	var fileName = args[0];
+	
+	//Can't create files unless the file system is formatted
+	if(krnFileSystemDriver.isFormatted){
+		if(fileName)
+		{
+			if(krnFileSystemDriver.create(fileName))
+			{
+				_StdIn.putText("File named " + fileName + " created!");
+			}
+			else
+			{
+				_StdIn.putText("Create was unsuccessful.");
+				krnTrace("Create failed");
+			}
+		}
+		else
+		{
+			_StdIn.putText("Please enter a file name to create.");
+		}
+	}
+	else
+	{
+		_StdIn.putText("File system must be formatted before files can be created.")
+	}
+}
+
+//Read file specified by the user and display contents.
+function shellRead(args){
+	var fileToRead = args[0];
+	
+	//File system must be formatted before any operations can be performed
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToRead)
+		{
+			var data = krnFileSystemDriver.read(fileToRead);
+			if(data.length > 0)
+			{
+				//Display data
+				for(var i = 0; i < data.length; i++)
+				{
+					if(i % 45 === 0)
+						_StdIn.advanceLine();
+					
+					_StdIn.putText(data.charAt(i));
+				}
+				_StdIn.advanceLine();
+				_StdIn.advanceLine();
+			}
+			else
+			{
+				_StdIn.putText("Read was not successful");
+			}
+		}
+		else
+		{
+			_StdIn.putText("Please specify a file name.");
+		}
+	}
+	else
+	{
+		_StdIn.putText("File system must be formatted before performing operations.")
+	}
+	
+}
+			
+
+
+//Write data to file specified by user.
+function shellWrite(args){
+	var fileToWrite = args[0];
+	var data = args.join(" ");
+	//Remove file name from the data
+	data = data.substring(fileToWrite.length + 1);
+	
+	//File system must be formatted before any operations can be performed
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToWrite && data)
+		{
+			var write = krnFileSystemDriver.write(fileToWrite, data);
+			if (write)
+			{
+				_StdIn.putText("Write to " + fileToWrite + " was successful.");
+			}
+			else
+			{
+				_StdIn.putText("Write to " + fileToWrite + " was not successful.");
+			}
+		}
+		else
+		{
+			if(!fileToWrite)
+			{
+				_StdIn.putText("Please specify a filename.");
+			}
+			if(!data )
+			{
+				_StdIn.putText("Please specify data to write.");
+			}
+			
+		}
+	}
+	else
+	{
+		_StdIn.putText("File system must be formatted before performing operations.")
+	}
+}
+
+//Delete file specified by the user.
+function shellDelete(args){
+	var fileToDelete = args[0];
+	
+	//File system must be formatted before performing any operations
+	if(krnFileSystemDriver.isFormatted){
+		if(fileToDelete)
+		{
+			if (krnFileSystemDriver.delete(fileToDelete))
+			{
+				_StdIn.putText(fileToDelete + " has been deleted.");
+			}
+			else
+			{
+				_StdIn.putText("Deletion was not successful");
+			}
+		}
+		else
+		{
+			_StdIn.putText("Please enter a file to delete");
+		}
+	}
+	else
+	{
+		_StdIn.putText("File system must be formatted before performing operations.")
+	}
+	
+}
+
+//Format all blocks in all sectors in all tracks.
+function shellFormat(args){
+	if (krnFileSystemDriver.format()) {
+		krnFileSystemDriver.isFormatted = true;
+		_StdIn.putText("Format successful.");
+	}
+	else {
+		_StdIn.putText("Format was unsuccessful.");
+	}
+}
+
+//List the files currently stored on the disk.
+function shellLS(args){
+	var fileList = krnFileSystemDriver.list();
+	
+	if(fileList)
+	{
+		_StdIn.putText("Files in the file system:");
+		_StdIn.advanceLine();
+		
+		for(index in fileList)
+		{
+			_StdIn.putText(fileList[index]);
+			_StdIn.advanceLine();
+		}
+	}
+	else
+	{
+		_StdIn.putText("There are no files in the file system");
+	}
+}
+
+//Set CPU scheduling algorithm.
+function shellSetSched(args){
+	var schedToSet = args[0];
+	
+	if (schedToSet === "rr"){
+		_Scheduler.algorithm = ROUNDR;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else if(schedToSet === "fcfs"){
+		_Scheduler.algorithm = FCFS;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else if(schedToSet === "priority"){
+		_Scheduler.algoritm = PRIORITY;
+		_StdIn.putText("Schedule set to " + schedToSet + ".");
+	}
+	else {
+		_StdIn.putText("Set schedule failed, pleade try again.");
+	}
+}
+
+//Get currently selected scheduling algorithm
+function shellGetSched(args){
+	switch(_Scheduler.algorithm){
+		case 0 : _StdIn.putText("Current scheduling algorithm is Round Robin.");
+		break;
+		case 1 :  _StdIn.putText("Current scheduling algorithm is FCFS.");
+		break;
+		case 2:  _StdIn.putText("Current scheduling algorithm is Priority.");
+		break;
 	}
 }
 

@@ -31,6 +31,7 @@
    <script type="text/javascript" src="scripts/os/pcb.js"></script>
    <script type="text/javascript" src="scripts/os/memoryManager.js"></script>
    <script type="text/javascript" src="scripts/os/scheduler.js"></script>
+   <script type="text/javascript" src="scripts/os/deviceDriverFileSystem.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="scripts/utils.js"></script>
@@ -142,13 +143,8 @@
 				</label>
 				</div>
 				<br><br>
-				<div id = "divMemDisplay">
-					<label>Memory Display
-						<table class = "MemDisplay" id = "MemDisplay">
-						</table>
-					</label>
-				</div>
-				<br><br>
+		
+				<br>
 				<div id = "divReadyQueue">
 					<label> Ready Queue
 						<table class = "ReadyQueue" id = "ReadyQueue">
@@ -176,6 +172,22 @@
 							<td name = "RQ3"></td>
 							<td name = "RQ3"></td>
 						</tr>
+						</table>
+					</label>
+				</div>
+			</td>
+			
+			<td>
+				<div id = "divMemDisplay">
+					<label>Memory Display
+						<table class = "MemDisplay" id = "MemDisplay">
+						</table>
+					</label>
+				</div>
+				
+				<div id = "divFSDisplay">
+					<label>File System Display
+						<table class = "FSDisplay" id = "FSDisplay">
 						</table>
 					</label>
 				</div>

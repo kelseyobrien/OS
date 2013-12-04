@@ -35,6 +35,12 @@ function krnBootstrap()      // Page 8.
    krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.  TODO: Should that have a _global-style name?
    krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
    krnTrace(krnKeyboardDriver.status);
+   
+   // Load the File System Device Driver
+   krnTrace("Loading the file system device driver.");
+   krnFileSystemDriver = new DeviceDriverFileSystem();
+   krnFileSystemDriver.driverEntry();
+   krnTrace(krnFileSystemDriver.status);
 
    //
    // ... more?
@@ -77,6 +83,9 @@ function krnOnCPUClockPulse()
        This, on the other hand, is the clock pulse from the hardware (or host) that tells the kernel 
        that it has to look for interrupts and process them if it finds any.                           */
 
+	updateReadyQueueDisplay();
+	if(_FSDisplay)
+		updateFSTable();	
     // Check for an interrupt, are any. Page 560
     if (_KernelInterruptQueue.getSize() > 0)    
     {
@@ -94,7 +103,6 @@ function krnOnCPUClockPulse()
        krnTrace("Idle");
     }
 	
-	updateReadyQueueDisplay();
 }
 
 
@@ -138,6 +146,9 @@ function krnInterruptHandler(irq, params)    // This is the Interrupt Handler Ro
 			break;
 		case INVALIDOP_IRQ:
 			krnInvalidOpISR();
+			break;
+		case CONTEXT_SWITCH:
+			_Scheduler.contextSwitch();
 			break;
         default: 
             krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

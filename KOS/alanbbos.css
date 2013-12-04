@@ -111,6 +111,32 @@ table.MemDisplay td {
 	border-color: black;
 }
 
+#divFSDisplay
+{
+	height: 340px;
+    width: 375px;
+    margin-bottom:5px;
+	overflow: auto;
+}
+	
+table.FSDisplay {
+	border-width: 1px;
+	border-color: red;
+	border-collapse: collapse;
+	height: 340px;
+    width: 355px;
+    margin-bottom:5px;
+	overflow: auto;
+}
+
+table.FSDisplay td {
+	background:white;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: black;
+}
+
 table.ReadyQueue {
 	border-width: 1px;
 	border-color: red;

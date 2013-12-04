@@ -38,7 +38,7 @@ function hostInit()
    
 
    // Check for our testing and enrichment core.
-  if (typeof Glados === "function") {
+	if (typeof Glados === "function") {
       _GLaDOS = new Glados();
       _GLaDOS.init();
    };
@@ -125,6 +125,8 @@ function hostBtnStartOS_click(btn)
 	_Scheduler = new Scheduler();
 	
 	createTable();
+	
+	createFSTable();
 	
 	// .. and call the OS Kernel Bootstrap routine.
     krnBootstrap();

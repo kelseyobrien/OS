@@ -40,11 +40,46 @@ function Cpu() {
 	}
     
     this.cycle = function() {
+		//Need to check if the process trying to run is in filesystem
+				
+		if(_CurrentProcess.base === -1)
+		{
+			//Roll out if there are no open slots in memory
+			if(!_MemoryManager.openSpaceExists())
+			{
+				if(_ReadyQueue.getSize() > 0)
+				{
+					_MemoryManager.rollOut(_ReadyQueue.getItem(_ReadyQueue.getSize() - 1));
+				}
+				else
+				{
+					var indexToRoll;
+					for(index in _ProgramsList)
+					{
+						if(_ProgramsList[index].base != -1)
+							indexToRoll = index;
+					}
+					_MemoryManager.rollOut(_ProgramsList[indexToRoll]);
+				}
+			}
+			_MemoryManager.rollIn(_CurrentProcess);
+		}
+		//Determine scheduler algorithm		
+		if (_Scheduler.algorithm === ROUNDR){
+			if (_Cycles > ROUND_QUANTUM){
+				krnInterruptHandler(CONTEXT_SWITCH);
+			}
+		}
+		else if (_Scheduler.algorithm === FCFS || _Scheduler.algorithm == PRIORITY){
+			if(_CurrentProcess.state === P_TERM){
+				krnInterruptHandler(CONTEXT_SWITCH);
+			}
+		}
+		
+		//Fetch and execute next instruction
 		this.execute(this.fetch());
         krnTrace("CPU cycle");
-		if (_Cycles > ROUND_QUANTUM){
-			_Scheduler.contextSwitch();
-		}
+		
 		//Increment cycle counter
 		_Cycles++;
 		
@@ -245,10 +280,12 @@ function noOp()
 function breakSysCall()
 {
 	_CurrentProcess.update(P_TERM,  _CPU.PC, _CPU.Acc, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+	//Set memory space open status to true
+	_MemoryManager.reverseSpaceStatus(_CurrentProcess.base);
 	//If there is process waiting in ready queue -> context switch
 	if(_ReadyQueue.getSize() >= 1)
 	{
-		_Scheduler.contextSwitch();
+		krnInterruptHandler(CONTEXT_SWITCH);
 	}
 	else { //No process waiting in the ready queue
 		updateReadyQueueDisplay();

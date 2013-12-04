@@ -21,6 +21,7 @@ var TIMER_IRQ = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prio
 var KEYBOARD_IRQ = 1;
 var MEMACCESS_IRQ = 2;  
 var INVALIDOP_IRQ = 3;
+var CONTEXT_SWITCH = 4;
 
 
 //
@@ -55,7 +56,12 @@ var P_LOAD   	= 1; // Process loaded in memory
 var P_RUN 	= 2; // Process currently executing
 var P_READY	= 3; // Process ready but waiting (will need this eventually)
 var P_TERM 	= 4; // Process finished executing
+var P_ON_DISK = 5; //Process in filesystem
 
+//Constants for Scheduling Algorithms
+var ROUNDR 	 = 0;
+var FCFS	 = 1;
+var PRIORITY = 2;
 
 // Default the OS trace to be on.
 var _Trace = true;
@@ -78,6 +84,7 @@ var _SarcasticMode = false;
 
 // Global Device Driver Objects - page 12
 var krnKeyboardDriver = null;
+var krnFileSystemDriver = null;
 
 // For testing...
 var _GLaDOS = null;
@@ -88,3 +95,10 @@ var status = "OS is running";
 //To keep track of the user command history
 var _CommandHistory = [];
 var _IndexOfCurrentCommand = -1;
+
+//File System Constants
+var MBRKEY = "[0,0,0]";
+var NULLTSB = "[-1,-1,-1]";
+
+//Help with display of filesystem
+var _FSDisplay = null;
